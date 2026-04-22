@@ -1,7 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using TreningsAppHaffi.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+var connectionString = builder.Configuration.GetConnectionString("MyAzureSqlConnectionString")
+    ?? throw new InvalidOperationException("Connection string 'MyAzureSqlConnectionString' not found.");
+
+builder.Services.AddDbContext<MyDatabaseContext>(options =>
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+        // Recommended: Enable resilience for Azure SQL (handles transient failures)
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    }));
 
 var app = builder.Build();
 
