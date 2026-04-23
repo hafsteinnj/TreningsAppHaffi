@@ -2,22 +2,46 @@
 @model TreningsAppHaffi.Pages.Index1Model
 @{ 
     ViewData["Title"] = "Changelog:";
+    // HafsteinnTestApp : app name
 }
 <h1>@ViewData["Title"]</h1>
 <p>
     Her har jeg tenkt å lage en liten changelog for å holde styr på hva jeg har gjort.
 </p>
 
+
 <!-- Coppy paste mal for å legge til nye endringer i changeloggen
 <div>
     <br /><br />
     <h4>Dato:  -  20/04/2026</h4>
-    <b>Timer:  -  0 timer</b><br />
-    <b>TLDR:  -  Kort oppsummering av hva jeg har gjort</b><br />
-    <b>Ting jeg har fått gjort:</b><br />
-    Tekst her...<br />
+    <br /><b>Timer:  -  0 timer</b>
+    <br /><b>TLDR:  -  Kort oppsummering av hva jeg har gjort</b>
+    <br /><b>Ting jeg har gjort:</b>
+    <br />Tekst her...
 </div>
 -->
+<div>
+    <br /><br />
+    <h4>Dato:  -  23/04/2026</h4>
+    <br /><b>Timer:  -  2 totalt i dag? give or take</b>
+    <br /><b>Usikker fordi jeg hadde en time hos legen midt i økta mi.</b>
+    <br /><b>TLDR:  -  Oppretter en enkel database funksjon & testknapper</b>
+    <br /><b>Ting jeg har gjort:</b>
+    <br />Bruker ChatGPT til å skrive ett forslag til "hva jeg trenger å gjøre for å opprette det jeg ønsker"..
+    <br />Dvs: 1 databasetabell med ID, DATO, DESCRIPTION, TEXT.   2 knapper på SQLtest. En som skriver litt test data til databasen. Og en annen som sletter alt innholdet i tabellen.
+    <br /> 1. bruker azure portal til å opprette en ny tabell. Trenger ikke funksjonalitet for det i/på selve siden.
+    <br /> Id INT IDENTITY(1,1) PRIMARY KEY,    CreatedDate DATETIME NOT NULL,    Description NVARCHAR(255),    Text NVARCHAR(MAX)
+    <br />
+    <br /> 2. knapper og funksjonalitet lagt til. Men jeg tror jeg får litt problemer med å skrive til databasen.
+    <br /> koden ser riktig ut. så jeg må dobbeltsjekke azure web services of firewall greiene.
+    <br /> Enten det eller å gi nødvendige rettigheter tid denne test appen.
+    <br /> --Viste seg til sist at det var en pakke jeg måtte laste ned med NuGet- for å authentikere 
+    <br />
+    <br /> <b><u>Endelig funker database forbindelsen som den skal!</u></b>
+    <br /> Nå kan jeg skrive til databasen og slette innholdet i tabellen ved hjelp av knappene på SQLtest siden.
+    <br /> Jeg har kun en 'knapp' Som legger til test-data, Så det må jeg endre til input-felt jeg kan faktisk skrive tekst i.
+    <br /> Så må jeg pynte litt på ting etterhvert.
+</div>
 <div>
     <br /><br />
     <h4>Dato:  -  22/04/2026</h4>

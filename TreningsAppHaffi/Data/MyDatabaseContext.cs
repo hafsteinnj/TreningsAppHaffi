@@ -19,5 +19,7 @@ namespace TreningsAppHaffi.Data
 
         // Add DbSets for your tables here
         // public DbSet<Product> Products { get; set; }
+
+        public DbSet<TestEntry> TestEntries { get; set; }
     }
 }

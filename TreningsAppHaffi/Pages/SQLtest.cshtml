@@ -1,9 +1,68 @@
 ﻿@page
-@model PrivacyModel
+@model SQLtestModel
 @{
     ViewData["Title"] = "SQL Test";
 }
 <h1>@ViewData["Title"]</h1>
+
+<!-- Knapp for å legge til en test- string i databasen-->
+<form method="post" onsubmit="handleSubmit(this)">
+    <button type="submit" id="insertBtn" asp-page-handler="Insert">
+        Insert Test Row
+    </button>
+
+    <span id="processingMessage" style="display:none; margin-left:10px;">
+        Processing...
+    </span>
+</form>
+
+<!-- Javascript for å vise "Processing..." og stopper evt bruker fra å klikke knappen flere ganger-->
+<script>
+    function handleSubmit(form) {
+        const button = document.getElementById("insertBtn");
+        const message = document.getElementById("processingMessage");
+
+        // Disable button
+        button.disabled = true;
+        button.innerText = "Inserting...";
+
+        // Show message
+        message.style.display = "inline";
+
+        // Allow form to continue submitting
+        return true;
+    }
+</script>
+
+<!-- Knapp for å rense innholdet i tabellen-->
+<form method="post">
+    <button type="submit" asp-page-handler="Clear">Clear Table</button>
+</form>
+
+<br />
+<br />
+
+<h3>Database SQL - Entries</h3>
+
+@if (Model.SqlEntries != null && Model.SqlEntries.Any())
+{
+    foreach (var entry in Model.SqlEntries)
+    {
+        <div style="margin-bottom:10px; padding:10px; border:1px solid #ccc;">
+            <strong>ID:</strong> @entry.Id <br />
+            <strong>Date:</strong> @entry.CreatedDate <br />
+            <strong>Description:</strong> @entry.Description <br />
+            <strong>Text:</strong> @entry.Text
+        </div>
+    }
+}
+else
+{
+    <p>No entries found.</p>
+}
+
+<br />
+<br />
 
 <p>
     Her har jeg tenkt å lage en liten SQL dagbok. Jeg ønsker å starte med noe helt simpelt.<br />
