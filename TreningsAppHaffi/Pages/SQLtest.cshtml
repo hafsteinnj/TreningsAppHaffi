@@ -5,7 +5,7 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<!-- Knapp for å legge til en test- string i databasen-->
+<!-- Knapp for å legge til en test- string i databasen
 <form method="post" onsubmit="handleSubmit(this)">
     <button type="submit" id="insertBtn" asp-page-handler="Insert">
         Insert Test Row
@@ -15,6 +15,30 @@
         Processing...
     </span>
 </form>
+-->
+
+<form method="post" onsubmit="handleSubmit(this)">
+    <div>
+        <label for="Description">Oppsummering</label><br />
+        <input type="text" id="Description" name="Description" required />
+    </div>
+
+    <div style="margin-top:10px;">
+        <label for="Text">Tekst / Beskrivelse</label><br />
+        <textarea id="Text" name="Text" rows="5" cols="40" required></textarea>
+    </div>
+
+    <div style="margin-top:10px;">
+        <button type="submit" id="insertBtn" asp-page-handler="Insert">
+            Legg til i dagboken
+        </button>
+
+        <span id="processingMessage" style="display:none; margin-left:10px;">
+            Processing...
+        </span>
+    </div>
+</form>
+
 
 <!-- Javascript for å vise "Processing..." og stopper evt bruker fra å klikke knappen flere ganger-->
 <script>

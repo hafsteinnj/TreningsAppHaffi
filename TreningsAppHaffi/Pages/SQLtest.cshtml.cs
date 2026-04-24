@@ -12,6 +12,12 @@ public class SQLtestModel : PageModel
     private readonly MyDatabaseContext _context;
     public List<TestEntry> SqlEntries { get; set; }
 
+    [BindProperty]
+    public string Description { get; set; }
+
+    [BindProperty]
+    public string Text { get; set; }
+
     public SQLtestModel(MyDatabaseContext context)
     {
         _context = context;
@@ -29,14 +35,15 @@ public class SQLtestModel : PageModel
         var entry = new TestEntry
         {
             CreatedDate = DateTime.Now,
-            Description = "Test entry",
-            Text = "This is a test row"
+            Description = Description,
+            Text = Text
         };
 
         _context.TestEntries.Add(entry);
         _context.SaveChanges();
 
-        return RedirectToPage(); // reloads and triggers OnGet(), - dvs oppdaterer SqlEntries-listen med den nye raden som nettopp ble lagt til.
+        return RedirectToPage(); 
+        // reloads and triggers OnGet(), - dvs oppdaterer SqlEntries-listen med den nye raden som nettopp ble lagt til.
     }
 
     public IActionResult OnPostClear()
