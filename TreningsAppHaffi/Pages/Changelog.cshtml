@@ -1,5 +1,5 @@
 ﻿@page
-@model TreningsAppHaffi.Pages.Index1Model
+@model TreningsAppHaffi.Pages.ChangelogModel
 @{ 
     ViewData["Title"] = "Changelog:";
     // HafsteinnTestApp : app name
@@ -22,267 +22,292 @@
 -->
 <div>
     <br /><br />
-    <h4>Dato:  -  06/05/2026</h4>
+    <h4>Dato:  -  17/08/2026</h4>
     <br /><b>Timer:  -  0.5 timer</b>
-    <br />Jeg har ikke hatt anledning til å jobbe så mye med siden min, den siste uken.
-    <br />Men. I dag har jeg brukt litt tid på å se på det jeg har. Og hva jeg kunne tenkt meg å gjøre videre.
-    <br />Ikke at jeg har bestemt meg. Men det er nødvendig for min egen del å 'pønske' litt... - for å kome meg i gang igjen.
+    <br />Nå har jeg prokrastinert i nermest to uker. Planen min var å starte på nytt for to uker siden, så jeg kunne ha god tid (Og eventuell innlevering til 'code review' kunne ha god tid også).
+    <br />Men "Here we are", Litt senere enn planlagt. Men jeg lovet meg selv å kjøre igjennom en oppdatering av siden min i dag & opdatering på githuben, så jeg gjør det synlig der også.
+    <br />Ofte er det bare ett lite steg jeg trenger til å komme i gang igjen. Og jeg håper at dette gjør susen.
+    <br />
+    <br />Jeg har allerede brukt en stund på å planlegge hva jeg ønsker å gjøre, dokumentert i et Google Dokument.
+    <br />https://docs.google.com/document/d/1swWuHPkl9pA_MCPXXSeX5EM2FePPHbIV-d0dxYKDro0/edit?usp=sharing
+    <br />
+    <br />Nummer en to og tre er å få til 'testing' av koden min. Spesielt knyttet SQL delen.
+    <br />For ikke å glemme at jeg må gjøre alle endringene knyttet SQL loggeren min, 'før' jeg tester den.
+    <br />Men jeg har også problemer knyttet minesweeperen også, som må fikses. Og en del pynt her og der jeg ønsker å få gjort.
 </div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  28/04/2026</h4>
-    <br /><b>Timer:  -  1 timer</b>
-    <br /><b>TLDR:  -  ny iterasjon av koden generert av chatgpt</b>
-    <br /><b>Ting jeg har gjort:</b>
-    <br />Registrerte meg hos chatgpt, for å kunne lagre samtalen min- men såklart mistet jeg da den første samtalen.
-    <br />Så jeg måtte starte på nytt, og få AI til å generere koden på nytt. Den ble stortset lik den første. Men med noen endringer og nye forslag- funket den faktisk denne gangen.
-    <br />Etter litt frem og tilbake- er koden nå oppe og gårende, og jeg har en fungerende minesweeper side. Med CSS som får 'ting' til å se ut som classic minesweeper.
-    <br />Det som fortsat mangler er høyreklikk funksjonaliteten for å markere flagg, evt layout endringer i tilfelle jeg åpner siden på mobilen telefonen min.
-    <br />Men jeg føler at jeg har gjort nok i dag.
-    <br />
-    <br />Enda en ting for 'idee listen min: 
-    <br />Jeg vil ha en side hvor jeg kan lese av meta data fra 'filer' jeg laster opp / dropper inn i siden.
-    <br />mange eksempler av at ai genererte bilder fortsatt inneholder metadata som gjør det åpenbart at de er AI.
-    <br />Kanskje også legge til litt funksjonalitet for å highlighte slikt i metadataene som vises.
-    <br />
-    <br />Reminder:
-    <br />Minesweeper: IF game over = true, stop input.
-    <br />Minesweeper: Fix flag logic.
-    <br />Minesweeper: ser ut som om timeren min har sluttet å virke på ett eller annet tidspunkt.
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  28/04/2026</h4>
-    <br /><b>Timer:  -  1.5 timer</b>
-    <br /><b>TLDR:  -  Lagt til Minesweeper siden (krasjer!)</b>
-    <br /><b>Ting jeg har gjort:</b>
-    <br />Har lagt til Minesweeper siden (work in progress). Skrevet av AI (chatgpt). Men noe i logikken bak krasjer for øyeblikket.
-    <br />Må se nermere på koden for å finne ut hva skjer.
-    <br />Må også sette opp azure authentication greia (usikker på hvordan dette ble gjort i farta) - så jeg kan debugge koden lokalt.
-    <br />Slik jeg har satt ting opp / og fordi alt er i samme prosjekt (ikke helt optimalt). Så må jeg være på riktig konto (gmail) for at localhost forbindelsen med azure skal gå igjennom. 
-    <br />Men den har defaultet til den gode gamle msn kontoen min.
-    <br />Og jeg har generelt bare lastet opp koden for å teste- men det gir meg ikke muligheten til å debugge koden lokalt.
-    <br />Tjaja. Jeg vil bare ha dette ferdig før møtet mit med Trond neste torsdag kl(13?). Så jeg trenger ikke bli ferdig i dag.
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  27/04/2026</h4>
-    <br /><b>Timer:  -  1 timer</b>
-    <br /><b>TLDR:  -  Mer planlegging. Prøver å få tankene mine ned på papier etter helga.</b>
-    <br /><b>Etter en god tenketid i dusjen:</b>
-    <br />1. SQL test siden som skal ta over changelogen.
-    <br />1.1 Slett ID knapp, sletter ID, input Tall eller "ALL"; return id not found hvis input er feil; Be om passord hvis input er korrekt; Trenger ikke være 100% sikkert, så legg passordet bare i cshtml.cs fila.
-    <br />1.2 Mye bedre oversiktlig system for output til siden når siden oppdateres. 
-    <br />Gitt hvor mye jeg skriver 'bok'... Og gitt jeg har ingen plan om å skrinlegge denne siden uten videre...
-    <br />output listen bør deles opp i år > uke > dag. Og kunne 'åpnes'/'trekkes sammen' - som forventet med '>' og 'v' knapper. til venstre for hver boks.
-    <br />alt jeg skriver, som faller under samme 'dag'.. si f.ex 3 innlegg. Bør vises under samme 'dag' boks, og ikke som 3 forskjellige bokser. Så det bør være en slags 'logg' for hver dag, hvor jeg kan se alle innleggene jeg har skrevet den dagen.
-    <br />Legg til 'TIMER' (float)(så jeg kan ha dager hvor jeg skriver 0.5 for en halvtime).. eller noe lignende i databasen/tabellen. Så jeg kan logge timene jeg bruker, likt jeg gjør på denne siden.
-    <br />Når År > Uke > Dag systemet så er på plass, skal timene jeg har brukt hver dag, vises til høyre for 'Dag' boksen. Som viser hvor mye tid jeg har brukt totalt den dagen/uka/året på prosjektet.
-    <br />
-    <br />2. Se hvor lang tid det tar meg... Start til slutt, å få AI til å lage Minesweeper i asp.net/razor for meg.
-    <br />Sjekk at jeg grovt forstår alt AI-en foreslår.
-    <br />Noter meg det, hvis det er noe jeg personlig 'absolutt' ville gjort annerledes.
-    <br />Evt endringer, layout for mobil/webside tanker. // Størrelse, Variabler, bruker grensesnitt & design.
-    <br />Mulig knapp audio? klikk klikk, boom?
-    <br />
-    <br />3. Prosjektet for min mor - Det jeg trodde jeg skulle starte  med i går kveld.
-    <br />Religert til 3.plass.  Jeg ønsker å gjøre ferdig dagbok/logg systemet mitt først.
-    <br />Evt. Se om det er et system Modern ønsker til for oversikt over studentene sine.
-    <br />Da vil jeg f.ex legge til en tabell som heter 'Student': ID, Navn, etc,etc,etc,etc,etc informasjon som kan vises om selve studenten.
-    <br />- sider / layout for registrering av sutdenter.
-    <br />- side for registrering av timer
-    <br />- side for endringer av studenter/timer
-    <br />- side for oversikt, hvor du velger en 'student' - og for 'alt oppsummert'. Både fra generell student ID. Og alt arbeidet hun har gjort knyttet hver enkelt student 'nedover'. Hvor timetall o.l er summert.
-    <br />Formatert på ett eller annet vis som gjør det lett å få oversikt over / dokumenterer hennes arbeidstimer.
-    <br />---- MEN. Dette er bare en ide. Jeg må gjøre ferdig min egen dagbok først. Vise henne den- og så se hva hun sier/tenker seg.
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  26/04/2026</h4>
-    <br /><b>Timer:  -  0.5 timer</b>
-    <br /><b>Har tenkt litt på hva jeg ønsker å gjøre fremover nå etter helga, 25/26.</b>
-    <br />Har også endret litt på teksten som står på forsiden.
-    <br />
-    <br />1. Jeg ønsker å gjøre litt endringer på SQL test siden, så jeg kan bruke den som changelog, i stedenfor denne html-en.
-    <br />Må legge til evnen til å slette ett og ett innlegg. Og noe sikring- så jeg noen andre sletter innleggene mine ved en feil.
-    <br />Kanskje noe med layouten.
-    <br />Kanskje en mulighet for å summere timene jeg har brukt hver uke/måned/totalt.
-    <br />
-    <br />2. Jeg hadde tanker om å lage et litt mer avanskert SQL test program, og planen var å bare gå for gjøre en 'oppgave' jeg såvidt husker å ha gjort.
-    <br />Men etter å ha tenkt på det en stund har jeg egentlig ett reellt program jeg kan lage for min mor.
-    <br />Etter å ha pensjonert seg driver hun en liten enkeltmanns bedrift som privat norsklærer.
-    <br />Og jeg kan lage noe som hjelper henne holde oversikt på fakturer, beltalingsmåter, timer? Jeg må snakke litt mer med henne, og planlegge litt.
-    <br />Så blir det kanskje noe brukbart.
-    <br />
-    <br />3. Tenkt litt på muligheten til å lage noen form for spill i asp / razor.
-    <br />Er ikke akkurat så enkelt når man ikke kan ha en game loop, og ting 'kun' oppdateres når brukeren utfører en input/handling.
-    <br />Men kortspill eller minesweeper kunne funket.
-    <br />Litt usikker på om jeg gidder å bruke tid på dette. Men det er noe jeg har tenkt litt på.
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  24/04/2026</h4>
-    <br /><b>Timer:  -  0-1 timer</b>
-    <br /><b>TLDR:  -  Lagt til tekst felt for input i databasen</b>
-    <br /><b>Ting jeg har gjort:</b>
-    <br />Bruker AI til å generere HTML koden jeg trenger litt raskere.
-    <br />C# delen har jeg mer eller mindre allerede, Må bare endre litt på den for å få det til å fungere med input feltene.
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  23/04/2026</h4>
-    <br /><b>Timer:  -  2 totalt i dag? give or take</b>
-    <br /><b>Usikker fordi jeg hadde en time hos legen midt i økta mi.</b>
-    <br /><b>TLDR:  -  Oppretter en enkel database funksjon & testknapper</b>
-    <br /><b>Ting jeg har gjort:</b>
-    <br />Bruker ChatGPT til å skrive ett forslag til "hva jeg trenger å gjøre for å opprette det jeg ønsker"..
-    <br />Dvs: 1 databasetabell med ID, DATO, DESCRIPTION, TEXT.   2 knapper på SQLtest. En som skriver litt test data til databasen. Og en annen som sletter alt innholdet i tabellen.
-    <br /> 1. bruker azure portal til å opprette en ny tabell. Trenger ikke funksjonalitet for det i/på selve siden.
-    <br /> Id INT IDENTITY(1,1) PRIMARY KEY,    CreatedDate DATETIME NOT NULL,    Description NVARCHAR(255),    Text NVARCHAR(MAX)
-    <br />
-    <br /> 2. knapper og funksjonalitet lagt til. Men jeg tror jeg får litt problemer med å skrive til databasen.
-    <br /> koden ser riktig ut. så jeg må dobbeltsjekke azure web services of firewall greiene.
-    <br /> Enten det eller å gi nødvendige rettigheter tid denne test appen.
-    <br /> --Viste seg til sist at det var en pakke jeg måtte laste ned med NuGet- for å authentikere 
-    <br />
-    <br /> <b><u>Endelig funker database forbindelsen som den skal!</u></b>
-    <br /> Nå kan jeg skrive til databasen og slette innholdet i tabellen ved hjelp av knappene på SQLtest siden.
-    <br /> Jeg har kun en 'knapp' Som legger til test-data, Så det må jeg endre til input-felt jeg kan faktisk skrive tekst i.
-    <br /> Så må jeg pynte litt på ting etterhvert.
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  22/04/2026</h4>
-    <b>Timer:  -  2t</b><br />
-    <b>TLDR:  -  Målet er å få i gang databasen og synliggjøre den på SQLtest siden</b><br />
-    <b>Ting jeg har utført etterhvert</b><br />
-    Skal gå rimelig greit å opprette databasen på via azure & knytte den til prosjektet(resource gruppen).<br />
-    **Dette tar noe lengre tid en forventet. Følger en guide skrevet at google ai & følgende windows webside (uten å bruke eksempel prosjektet deres):<br />
-    **<a href="https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-dotnet-sqldatabase" target="_blank">https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-dotnet-sqldatabase</a> <br />
-    **Fjerner appsettings.json fra git. Ikke helt optimalt, men raskeste måten å unngå publiseringen av sensitiv informasjon på. Uten keyvault eller lignende. <br />
-    **Finner ut at jeg kanskje har overreagert mht appsettings.<br />
-    **Dette tar mye mer tid en jeg trodde jeg skulle bruke. Satt og sloss med noe i 10-15min, som viste seg å være en 'enkel' kommafeil til slutt.<br />
-    **<br />
-    <i>
-    **Databasen er endelig opprettet og alt er koblet innad i visual studio. Dette tok meg mye lengre tid en forventet. Nærmere 2t.<br />
-    **Så nå tar jeg en pause. Regner med å ta en økt senere på dagen hvor jeg prøver å 'gjøre noe' med databasen. Den står for øyeblikket helt tom.<br />
-    **Så jeg ser for meg at jeg må initializere den & sette opp en tabell, Så blir mål 1, og vise 1 linje med tekst 'hentet' fra databasen. Før jeg finner på noe annet lurt.<br /><br />
-    </i>
-    <s>
-    Jeg regner med at det vil ta meg litt tid å lage ett enkelt grensesnitt for å skrive til databasen. <br />
-    Og så litt tid til å knytte det alt sammen & vise noe output. <br />
-    </s>
-    Ekstra knapper og layout blir nok ikke gjort i dag...<br />
-        
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  21/04/2026</h4>
-    <b>Timer:  -  10-20min tanker før jeg gjør noe mer i dag</b><br />
-    <b>Ting jeg ønsker å få gjort:</b><br />
-    Jeg syns siden ser brukbar ut så langt. Men utifra 'oppgave teksten' har jeg egentlig ikke vist noe serlig c#. Det er for det meste bare html (som jeg aldri har vert serlig flink til å bruke),<br />
-    og den auto genererte koden som fylles inn når jeg oppretter nye sider igjennom Visual Studio. <br />
-    Jeg viser heller ikke noen serlig bruk av AI verktøy, som jeg egentlig hadde tenkt å bruke mer av i starten.<br />
-    Såklart har jeg brukt AI for å svare på spørsmål og lignende, som jeg har hatt. Spørsmål jeg evt ville fått svar på via StackOverflow.com tidligere. <br />
-    <br />
-    <u>Så planen min fremover:</u><br />
-    * 1. del websiden og githuben med Tr. og Ch. så de kan se jeg 'gjør noe'. Evt jeg kan bruke det for å stille spørsmål senere.<br />
-    <i>Dette er det eneste jeg 'vet jeg vil få gjort i løpet av dagen i dag. Har etc privat som kan hende tar opp resten av dagen i dag.</i><br /> <br />
-    * 2. oprett en azure SQL database. ID, DATO, OVERSKRIFT, TEKST, etc?<br />
-    * 3. implementer funksjonaliteten som trengs til å skrive til databasen på SQLtest siden. <br />
-    * 4. ekstra funksjonalitet som å slette innhold, evt vise innholdet som en 'gjestebok' lignende liste. <br />
-    Selv om tanken er å bruke det som en slags changelog for meg selv. <br />
-    <i>Det vil være litt C# involvert her. Og tanken er å se hva jeg kan få AI til å generere for meg. Så evt kopiere det jeg trenger fra den AI genrerte koden.</i> <br />
-    * 5. har noen tanker om å endre layout på siden, men det er ikke så viktig. <br />
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  20/04/2026</h4>
-    <b>Timer:  -  2-3? timer</b><br />
-    <b>TLDR:  -  Skrevet denne changeloggen, pluss litt bakover i tid</b><br />
-    <b>Ting jeg har fått gjort:</b><br />
-    Forsøk på å pushe denne 'hello world' siden til Azure. <i>-Check V-</i><br />
-    <i>Det tok en god del tid å finne en azure server som godtok gratis server hosting. Endte opp i Canada Central til slutt.</i><br />
-    <a href="https://hafsteinntestapp-amh4cnaacvd4h2eb.canadacentral-01.azurewebsites.net/" target="_blank">https://hafsteinntestapp-amh4cnaacvd4h2eb.canadacentral-01.azurewebsites.net/</a><br />
-    Forsøk på å pushe all koden til github. For så å gjøre små endringer og pushe de også. <i>-Check V-</i><br />
-    <i>Tok 5 min å laste opp koden til github som ett nytt prosjekt. og mer en en time å prøve å finne ut hvorfor i... svarte, jeg ikke kan enkelt pushe små endringer...</i><br />
-    <i>Til slutt var det 'bare' det at jeg manglet eposten min i git-settings i visual studio så jeg kunne velge å 'committe' changes. Det er de små tingene man kan bli helt gal av...</i><br />
-    <a href="https://github.com/hafsteinnj/TreningsAppHaffi" target="_blank">https://github.com/hafsteinnj/TreningsAppHaffi</a><br />
 
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  20/04/2026</h4>
-    <b>Timer:  -  2-3 timer</b><br />
-    <b>TLDR: Føles bra å få startet på det jeg har hengt meg opp over de siste par dagene. <br /> 
-    "Hello world" oppnådd..</b> <br />
-    <b>Ting jeg har fått gjort:</b><br />
-    Registrerte meg på Azure,<br />
-    <i>* Azure siden nektet å la meg oprette en ny konto på grunn av noe backend oppdateringer? Men så etter en time, ga jeg meg og brukte Edge i stedenfor Firefox. Og da funket alt 'plutselig'.</i><br />
-    Opprettet ASP.net core web app - Model view controller... Og fant etter litt ut at det var antagligvis ikke akkurat jeg ville ha. <br />
-    Opprettet dette ASP.net (Razor) prosjektet.<br />
-    Bruker litt tid på å finne ut av hvor i pokker _layout filen ligger.<br />
-    Legger til ett par sider jeg har planlagt å fylle inn i etterhvert.<br />
-    Hello World, SQL test, Changelog og Etc.<br />
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  18 - 19/04/2026</h4>
-    <b>Timer:  -  0 timer</b><br />
-    <b>TLDR:  -  Planen var å starte, men jeg kom meg ikke i gang</b><br />
-    <b>Ting jeg har fått gjort:</b><br />
-    Lite egentlig gjort<br />
-    Jeg vet jeg har god tid, men også at jeg burde komme meg i gang. <br />
-    <i>* Planen var klar i hodet, men det var en viss prestasjons angst knyttet til å begynne i det hele tatt.</i><br />
-    <i>* Kan jeg egentlig det jeg kan? Kan jeg noe som helst? Etter å ha vært hos NAV lenge nok blir selvsikkerheten veldig raskt et offer.</i><br />
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  15 - 17/04/2026</h4>
-    <b>Timer:  -  1-2 timer</b><br />
-    <b>TLDR:  -  Ble informer om oppgaven, fikk videresent eposten fra Trond Hol.</b><br />
-    <b>Ting jeg har fått gjort:</b><br />
-    Første tanken var vel at dette hørtes egentlig veldig simpelt ut... <br />
-    Andre tanken min vel -- okay.. men hvor langt kan jeg egentlig dra ut prosjektet. Både for min egen del og for å imponere litt. <br />
-    SQL er ikke nevnt i oppgaveteksten. Men jeg tenker det skulle være enkelt nok å legge til en liten database. <br />
-    <b>Planen min blir etterhvert følgende:</b> <br />
-    Last ned Visual studio. Evt Bruker på github hvis jeg ikke husker den gamle bruker IDn min. <br />
-    registrer meg på Azure. <br />
-    ASP.net webside av ett eller annet slag. <br />
-    Start enkelt med hello world. <br />
-    Push til Azure, for å se om ikke det funker. <br />
-    legg til en SQL database, og koble den til nettsiden. <br />
-    lag en dagbok funskjon på nettsiden. <br />
-    lag en mer avansert database / fantasi programm for registrering av 'noe'. Jeg mener jeg husker såvidt noen gamle oppgaver jeg kan bruke som inspirasjon. <br />
-    <br />
-    Brukte en god del tid til å se på forskjellige AI verktøy jeg kunne bruke for å hjelpe meg med oppgaven. Uten å gjøre noen endelige valg- <br />
+<details>
+    <summary><h3>- Klikk for å se logg fra 12/04/2026 til 06/05/2026 -</h3></summary>
+    <div class="dropdown-content">
+        <div>
+            <br /><br />
+            <h4>Dato:  -  06/05/2026</h4>
+            <br /><b>Timer:  -  0.5 timer</b>
+            <br />Jeg har ikke hatt anledning til å jobbe så mye med siden min, den siste uken.
+            <br />Men. I dag har jeg brukt litt tid på å se på det jeg har. Og hva jeg kunne tenkt meg å gjøre videre.
+            <br />Ikke at jeg har bestemt meg. Men det er nødvendig for min egen del å 'pønske' litt... - for å kome meg i gang igjen.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  28/04/2026</h4>
+            <br /><b>Timer:  -  1 timer</b>
+            <br /><b>TLDR:  -  ny iterasjon av koden generert av chatgpt</b>
+            <br /><b>Ting jeg har gjort:</b>
+            <br />Registrerte meg hos chatgpt, for å kunne lagre samtalen min- men såklart mistet jeg da den første samtalen.
+            <br />Så jeg måtte starte på nytt, og få AI til å generere koden på nytt. Den ble stortset lik den første. Men med noen endringer og nye forslag- funket den faktisk denne gangen.
+            <br />Etter litt frem og tilbake- er koden nå oppe og gårende, og jeg har en fungerende minesweeper side. Med CSS som får 'ting' til å se ut som classic minesweeper.
+            <br />Det som fortsat mangler er høyreklikk funksjonaliteten for å markere flagg, evt layout endringer i tilfelle jeg åpner siden på mobilen telefonen min.
+            <br />Men jeg føler at jeg har gjort nok i dag.
+            <br />
+            <br />Enda en ting for 'idee listen min:
+            <br />Jeg vil ha en side hvor jeg kan lese av meta data fra 'filer' jeg laster opp / dropper inn i siden.
+            <br />mange eksempler av at ai genererte bilder fortsatt inneholder metadata som gjør det åpenbart at de er AI.
+            <br />Kanskje også legge til litt funksjonalitet for å highlighte slikt i metadataene som vises.
+            <br />
+            <br />Reminder:
+            <br />Minesweeper: IF game over = true, stop input.
+            <br />Minesweeper: Fix flag logic.
+            <br />Minesweeper: ser ut som om timeren min har sluttet å virke på ett eller annet tidspunkt.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  28/04/2026</h4>
+            <br /><b>Timer:  -  1.5 timer</b>
+            <br /><b>TLDR:  -  Lagt til Minesweeper siden (krasjer!)</b>
+            <br /><b>Ting jeg har gjort:</b>
+            <br />Har lagt til Minesweeper siden (work in progress). Skrevet av AI (chatgpt). Men noe i logikken bak krasjer for øyeblikket.
+            <br />Må se nermere på koden for å finne ut hva skjer.
+            <br />Må også sette opp azure authentication greia (usikker på hvordan dette ble gjort i farta) - så jeg kan debugge koden lokalt.
+            <br />Slik jeg har satt ting opp / og fordi alt er i samme prosjekt (ikke helt optimalt). Så må jeg være på riktig konto (gmail) for at localhost forbindelsen med azure skal gå igjennom.
+            <br />Men den har defaultet til den gode gamle msn kontoen min.
+            <br />Og jeg har generelt bare lastet opp koden for å teste- men det gir meg ikke muligheten til å debugge koden lokalt.
+            <br />Tjaja. Jeg vil bare ha dette ferdig før møtet mit med Trond neste torsdag kl(13?). Så jeg trenger ikke bli ferdig i dag.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  27/04/2026</h4>
+            <br /><b>Timer:  -  1 timer</b>
+            <br /><b>TLDR:  -  Mer planlegging. Prøver å få tankene mine ned på papier etter helga.</b>
+            <br /><b>Etter en god tenketid i dusjen:</b>
+            <br />1. SQL test siden som skal ta over changelogen.
+            <br />1.1 Slett ID knapp, sletter ID, input Tall eller "ALL"; return id not found hvis input er feil; Be om passord hvis input er korrekt; Trenger ikke være 100% sikkert, så legg passordet bare i cshtml.cs fila.
+            <br />1.2 Mye bedre oversiktlig system for output til siden når siden oppdateres.
+            <br />Gitt hvor mye jeg skriver 'bok'... Og gitt jeg har ingen plan om å skrinlegge denne siden uten videre...
+            <br />output listen bør deles opp i år > uke > dag. Og kunne 'åpnes'/'trekkes sammen' - som forventet med '>' og 'v' knapper. til venstre for hver boks.
+            <br />alt jeg skriver, som faller under samme 'dag'.. si f.ex 3 innlegg. Bør vises under samme 'dag' boks, og ikke som 3 forskjellige bokser. Så det bør være en slags 'logg' for hver dag, hvor jeg kan se alle innleggene jeg har skrevet den dagen.
+            <br />Legg til 'TIMER' (float)(så jeg kan ha dager hvor jeg skriver 0.5 for en halvtime).. eller noe lignende i databasen/tabellen. Så jeg kan logge timene jeg bruker, likt jeg gjør på denne siden.
+            <br />Når År > Uke > Dag systemet så er på plass, skal timene jeg har brukt hver dag, vises til høyre for 'Dag' boksen. Som viser hvor mye tid jeg har brukt totalt den dagen/uka/året på prosjektet.
+            <br />
+            <br />2. Se hvor lang tid det tar meg... Start til slutt, å få AI til å lage Minesweeper i asp.net/razor for meg.
+            <br />Sjekk at jeg grovt forstår alt AI-en foreslår.
+            <br />Noter meg det, hvis det er noe jeg personlig 'absolutt' ville gjort annerledes.
+            <br />Evt endringer, layout for mobil/webside tanker. // Størrelse, Variabler, bruker grensesnitt & design.
+            <br />Mulig knapp audio? klikk klikk, boom?
+            <br />
+            <br />3. Prosjektet for min mor - Det jeg trodde jeg skulle starte  med i går kveld.
+            <br />Religert til 3.plass.  Jeg ønsker å gjøre ferdig dagbok/logg systemet mitt først.
+            <br />Evt. Se om det er et system Modern ønsker til for oversikt over studentene sine.
+            <br />Da vil jeg f.ex legge til en tabell som heter 'Student': ID, Navn, etc,etc,etc,etc,etc informasjon som kan vises om selve studenten.
+            <br />- sider / layout for registrering av sutdenter.
+            <br />- side for registrering av timer
+            <br />- side for endringer av studenter/timer
+            <br />- side for oversikt, hvor du velger en 'student' - og for 'alt oppsummert'. Både fra generell student ID. Og alt arbeidet hun har gjort knyttet hver enkelt student 'nedover'. Hvor timetall o.l er summert.
+            <br />Formatert på ett eller annet vis som gjør det lett å få oversikt over / dokumenterer hennes arbeidstimer.
+            <br />---- MEN. Dette er bare en ide. Jeg må gjøre ferdig min egen dagbok først. Vise henne den- og så se hva hun sier/tenker seg.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  26/04/2026</h4>
+            <br /><b>Timer:  -  0.5 timer</b>
+            <br /><b>Har tenkt litt på hva jeg ønsker å gjøre fremover nå etter helga, 25/26.</b>
+            <br />Har også endret litt på teksten som står på forsiden.
+            <br />
+            <br />1. Jeg ønsker å gjøre litt endringer på SQL test siden, så jeg kan bruke den som changelog, i stedenfor denne html-en.
+            <br />Må legge til evnen til å slette ett og ett innlegg. Og noe sikring- så jeg noen andre sletter innleggene mine ved en feil.
+            <br />Kanskje noe med layouten.
+            <br />Kanskje en mulighet for å summere timene jeg har brukt hver uke/måned/totalt.
+            <br />
+            <br />2. Jeg hadde tanker om å lage et litt mer avanskert SQL test program, og planen var å bare gå for gjøre en 'oppgave' jeg såvidt husker å ha gjort.
+            <br />Men etter å ha tenkt på det en stund har jeg egentlig ett reellt program jeg kan lage for min mor.
+            <br />Etter å ha pensjonert seg driver hun en liten enkeltmanns bedrift som privat norsklærer.
+            <br />Og jeg kan lage noe som hjelper henne holde oversikt på fakturer, beltalingsmåter, timer? Jeg må snakke litt mer med henne, og planlegge litt.
+            <br />Så blir det kanskje noe brukbart.
+            <br />
+            <br />3. Tenkt litt på muligheten til å lage noen form for spill i asp / razor.
+            <br />Er ikke akkurat så enkelt når man ikke kan ha en game loop, og ting 'kun' oppdateres når brukeren utfører en input/handling.
+            <br />Men kortspill eller minesweeper kunne funket.
+            <br />Litt usikker på om jeg gidder å bruke tid på dette. Men det er noe jeg har tenkt litt på.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  24/04/2026</h4>
+            <br /><b>Timer:  -  0-1 timer</b>
+            <br /><b>TLDR:  -  Lagt til tekst felt for input i databasen</b>
+            <br /><b>Ting jeg har gjort:</b>
+            <br />Bruker AI til å generere HTML koden jeg trenger litt raskere.
+            <br />C# delen har jeg mer eller mindre allerede, Må bare endre litt på den for å få det til å fungere med input feltene.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  23/04/2026</h4>
+            <br /><b>Timer:  -  2 totalt i dag? give or take</b>
+            <br /><b>Usikker fordi jeg hadde en time hos legen midt i økta mi.</b>
+            <br /><b>TLDR:  -  Oppretter en enkel database funksjon & testknapper</b>
+            <br /><b>Ting jeg har gjort:</b>
+            <br />Bruker ChatGPT til å skrive ett forslag til "hva jeg trenger å gjøre for å opprette det jeg ønsker"..
+            <br />Dvs: 1 databasetabell med ID, DATO, DESCRIPTION, TEXT.   2 knapper på SQLtest. En som skriver litt test data til databasen. Og en annen som sletter alt innholdet i tabellen.
+            <br /> 1. bruker azure portal til å opprette en ny tabell. Trenger ikke funksjonalitet for det i/på selve siden.
+            <br /> Id INT IDENTITY(1,1) PRIMARY KEY,    CreatedDate DATETIME NOT NULL,    Description NVARCHAR(255),    Text NVARCHAR(MAX)
+            <br />
+            <br /> 2. knapper og funksjonalitet lagt til. Men jeg tror jeg får litt problemer med å skrive til databasen.
+            <br /> koden ser riktig ut. så jeg må dobbeltsjekke azure web services of firewall greiene.
+            <br /> Enten det eller å gi nødvendige rettigheter tid denne test appen.
+            <br /> --Viste seg til sist at det var en pakke jeg måtte laste ned med NuGet- for å authentikere
+            <br />
+            <br /> <b><u>Endelig funker database forbindelsen som den skal!</u></b>
+            <br /> Nå kan jeg skrive til databasen og slette innholdet i tabellen ved hjelp av knappene på SQLtest siden.
+            <br /> Jeg har kun en 'knapp' Som legger til test-data, Så det må jeg endre til input-felt jeg kan faktisk skrive tekst i.
+            <br /> Så må jeg pynte litt på ting etterhvert.
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  22/04/2026</h4>
+            <b>Timer:  -  2t</b><br />
+            <b>TLDR:  -  Målet er å få i gang databasen og synliggjøre den på SQLtest siden</b><br />
+            <b>Ting jeg har utført etterhvert</b><br />
+            Skal gå rimelig greit å opprette databasen på via azure & knytte den til prosjektet(resource gruppen).<br />
+            **Dette tar noe lengre tid en forventet. Følger en guide skrevet at google ai & følgende windows webside (uten å bruke eksempel prosjektet deres):<br />
+            **<a href="https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-dotnet-sqldatabase" target="_blank">https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-dotnet-sqldatabase</a> <br />
+            **Fjerner appsettings.json fra git. Ikke helt optimalt, men raskeste måten å unngå publiseringen av sensitiv informasjon på. Uten keyvault eller lignende. <br />
+            **Finner ut at jeg kanskje har overreagert mht appsettings.<br />
+            **Dette tar mye mer tid en jeg trodde jeg skulle bruke. Satt og sloss med noe i 10-15min, som viste seg å være en 'enkel' kommafeil til slutt.<br />
+            **<br />
+            <i>
+                **Databasen er endelig opprettet og alt er koblet innad i visual studio. Dette tok meg mye lengre tid en forventet. Nærmere 2t.<br />
+                **Så nå tar jeg en pause. Regner med å ta en økt senere på dagen hvor jeg prøver å 'gjøre noe' med databasen. Den står for øyeblikket helt tom.<br />
+                **Så jeg ser for meg at jeg må initializere den & sette opp en tabell, Så blir mål 1, og vise 1 linje med tekst 'hentet' fra databasen. Før jeg finner på noe annet lurt.<br /><br />
+            </i>
+            <s>
+                Jeg regner med at det vil ta meg litt tid å lage ett enkelt grensesnitt for å skrive til databasen. <br />
+                Og så litt tid til å knytte det alt sammen & vise noe output. <br />
+            </s>
+            Ekstra knapper og layout blir nok ikke gjort i dag...<br />
 
-    <br />
-    <b>Oppgaveteksten:</b><br />
-    Hei,<br />
-    Det vi ønsker fra vår side er et prosjekt/eksempel hvor Hafsteinn har satt opp noe med nettskyen (vi bruker AWS, men et prosjekt mot feks Azure eller andre tjenester vil også fungere).<br />
-    <br />
-    En enkel nettside som viser frem et eller annet, og som aller helst benytter .NET og C#, som vi bruker som hovedspråk hos oss - men andre språk er også helt ok.<br />
-    <br />
-    Det trenger ikke være noe veldig avansert.<br />
-    <br />
-    Det vi er ute etter er å se eksempeler på programmeringsspråk vi bruker, og også hvor raskt man tar teknologi/lærer seg ny teknologi.<br />
-    Det vil gi oss en pekepinn på hvor raskt han eventuelt kommer i gang, og hvor mye hjelp han vil måtte trenge.<br />
-    <br />
-    Dette er ting vi spør om i reelle jobbintervju også.<br />
-    <br />
-    Det er også veldig lov å benytte seg av AI (vil faktisk oppfordre til det) - men man bør da i så fall klare å forklare hva AI'en har lagd, og hvorfor man har valgt å bruke den løsningen den kom opp med.<br />
-    <br />
-    Ta gjerne kontakt om du lurer på noe.<br />
-</div>
-<div>
-    <br /><br />
-    <h4>Dato:  -  12-14/04/2026</h4>
-    <b>Timer:  -  2-3 timer</b><br />
-    <b>TLDR:  -  Litt før og etter møtet med Ti. / Tr. mandag 13.</b><br />
-    <b>Ting jeg har fått gjort:</b><br />
-    Gjorde ett forsøk på å se etter enkle programmerings oppgaver.<br />
-    Endte opp på boot.dev, og gjorde ferdig en hel masse 'enkle' programmerings oppgaver der. <br />
-    Men de har værken C# eller C++ på boot.dev, så det var egentlig litt bortkastet tid. <br />
-    Men greit nok for å bare skrive litt kode, selv om syntaksen var annerledes enn det jeg er vant til. <br />
-</div>
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  21/04/2026</h4>
+            <b>Timer:  -  10-20min tanker før jeg gjør noe mer i dag</b><br />
+            <b>Ting jeg ønsker å få gjort:</b><br />
+            Jeg syns siden ser brukbar ut så langt. Men utifra 'oppgave teksten' har jeg egentlig ikke vist noe serlig c#. Det er for det meste bare html (som jeg aldri har vert serlig flink til å bruke),<br />
+            og den auto genererte koden som fylles inn når jeg oppretter nye sider igjennom Visual Studio. <br />
+            Jeg viser heller ikke noen serlig bruk av AI verktøy, som jeg egentlig hadde tenkt å bruke mer av i starten.<br />
+            Såklart har jeg brukt AI for å svare på spørsmål og lignende, som jeg har hatt. Spørsmål jeg evt ville fått svar på via StackOverflow.com tidligere. <br />
+            <br />
+            <u>Så planen min fremover:</u><br />
+            * 1. del websiden og githuben med Tr. og Ch. så de kan se jeg 'gjør noe'. Evt jeg kan bruke det for å stille spørsmål senere.<br />
+            <i>Dette er det eneste jeg 'vet jeg vil få gjort i løpet av dagen i dag. Har etc privat som kan hende tar opp resten av dagen i dag.</i><br /> <br />
+            * 2. oprett en azure SQL database. ID, DATO, OVERSKRIFT, TEKST, etc?<br />
+            * 3. implementer funksjonaliteten som trengs til å skrive til databasen på SQLtest siden. <br />
+            * 4. ekstra funksjonalitet som å slette innhold, evt vise innholdet som en 'gjestebok' lignende liste. <br />
+            Selv om tanken er å bruke det som en slags changelog for meg selv. <br />
+            <i>Det vil være litt C# involvert her. Og tanken er å se hva jeg kan få AI til å generere for meg. Så evt kopiere det jeg trenger fra den AI genrerte koden.</i> <br />
+            * 5. har noen tanker om å endre layout på siden, men det er ikke så viktig. <br />
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  20/04/2026</h4>
+            <b>Timer:  -  2-3? timer</b><br />
+            <b>TLDR:  -  Skrevet denne changeloggen, pluss litt bakover i tid</b><br />
+            <b>Ting jeg har fått gjort:</b><br />
+            Forsøk på å pushe denne 'hello world' siden til Azure. <i>-Check V-</i><br />
+            <i>Det tok en god del tid å finne en azure server som godtok gratis server hosting. Endte opp i Canada Central til slutt.</i><br />
+            <a href="https://hafsteinntestapp-amh4cnaacvd4h2eb.canadacentral-01.azurewebsites.net/" target="_blank">https://hafsteinntestapp-amh4cnaacvd4h2eb.canadacentral-01.azurewebsites.net/</a><br />
+            Forsøk på å pushe all koden til github. For så å gjøre små endringer og pushe de også. <i>-Check V-</i><br />
+            <i>Tok 5 min å laste opp koden til github som ett nytt prosjekt. og mer en en time å prøve å finne ut hvorfor i... svarte, jeg ikke kan enkelt pushe små endringer...</i><br />
+            <i>Til slutt var det 'bare' det at jeg manglet eposten min i git-settings i visual studio så jeg kunne velge å 'committe' changes. Det er de små tingene man kan bli helt gal av...</i><br />
+            <a href="https://github.com/hafsteinnj/TreningsAppHaffi" target="_blank">https://github.com/hafsteinnj/TreningsAppHaffi</a><br />
+
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  20/04/2026</h4>
+            <b>Timer:  -  2-3 timer</b><br />
+            <b>
+                TLDR: Føles bra å få startet på det jeg har hengt meg opp over de siste par dagene. <br />
+                "Hello world" oppnådd..
+            </b> <br />
+            <b>Ting jeg har fått gjort:</b><br />
+            Registrerte meg på Azure,<br />
+            <i>* Azure siden nektet å la meg oprette en ny konto på grunn av noe backend oppdateringer? Men så etter en time, ga jeg meg og brukte Edge i stedenfor Firefox. Og da funket alt 'plutselig'.</i><br />
+            Opprettet ASP.net core web app - Model view controller... Og fant etter litt ut at det var antagligvis ikke akkurat jeg ville ha. <br />
+            Opprettet dette ASP.net (Razor) prosjektet.<br />
+            Bruker litt tid på å finne ut av hvor i pokker _layout filen ligger.<br />
+            Legger til ett par sider jeg har planlagt å fylle inn i etterhvert.<br />
+            Hello World, SQL test, Changelog og Etc.<br />
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  18 - 19/04/2026</h4>
+            <b>Timer:  -  0 timer</b><br />
+            <b>TLDR:  -  Planen var å starte, men jeg kom meg ikke i gang</b><br />
+            <b>Ting jeg har fått gjort:</b><br />
+            Lite egentlig gjort<br />
+            Jeg vet jeg har god tid, men også at jeg burde komme meg i gang. <br />
+            <i>* Planen var klar i hodet, men det var en viss prestasjons angst knyttet til å begynne i det hele tatt.</i><br />
+            <i>* Kan jeg egentlig det jeg kan? Kan jeg noe som helst? Etter å ha vært hos NAV lenge nok blir selvsikkerheten veldig raskt et offer.</i><br />
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  15 - 17/04/2026</h4>
+            <b>Timer:  -  1-2 timer</b><br />
+            <b>TLDR:  -  Ble informer om oppgaven, fikk videresent eposten fra Trond Hol.</b><br />
+            <b>Ting jeg har fått gjort:</b><br />
+            Første tanken var vel at dette hørtes egentlig veldig simpelt ut... <br />
+            Andre tanken min vel -- okay.. men hvor langt kan jeg egentlig dra ut prosjektet. Både for min egen del og for å imponere litt. <br />
+            SQL er ikke nevnt i oppgaveteksten. Men jeg tenker det skulle være enkelt nok å legge til en liten database. <br />
+            <b>Planen min blir etterhvert følgende:</b> <br />
+            Last ned Visual studio. Evt Bruker på github hvis jeg ikke husker den gamle bruker IDn min. <br />
+            registrer meg på Azure. <br />
+            ASP.net webside av ett eller annet slag. <br />
+            Start enkelt med hello world. <br />
+            Push til Azure, for å se om ikke det funker. <br />
+            legg til en SQL database, og koble den til nettsiden. <br />
+            lag en dagbok funskjon på nettsiden. <br />
+            lag en mer avansert database / fantasi programm for registrering av 'noe'. Jeg mener jeg husker såvidt noen gamle oppgaver jeg kan bruke som inspirasjon. <br />
+            <br />
+            Brukte en god del tid til å se på forskjellige AI verktøy jeg kunne bruke for å hjelpe meg med oppgaven. Uten å gjøre noen endelige valg- <br />
+
+            <br />
+            <b>Oppgaveteksten:</b><br />
+            Hei,<br />
+            Det vi ønsker fra vår side er et prosjekt/eksempel hvor Hafsteinn har satt opp noe med nettskyen (vi bruker AWS, men et prosjekt mot feks Azure eller andre tjenester vil også fungere).<br />
+            <br />
+            En enkel nettside som viser frem et eller annet, og som aller helst benytter .NET og C#, som vi bruker som hovedspråk hos oss - men andre språk er også helt ok.<br />
+            <br />
+            Det trenger ikke være noe veldig avansert.<br />
+            <br />
+            Det vi er ute etter er å se eksempeler på programmeringsspråk vi bruker, og også hvor raskt man tar teknologi/lærer seg ny teknologi.<br />
+            Det vil gi oss en pekepinn på hvor raskt han eventuelt kommer i gang, og hvor mye hjelp han vil måtte trenge.<br />
+            <br />
+            Dette er ting vi spør om i reelle jobbintervju også.<br />
+            <br />
+            Det er også veldig lov å benytte seg av AI (vil faktisk oppfordre til det) - men man bør da i så fall klare å forklare hva AI'en har lagd, og hvorfor man har valgt å bruke den løsningen den kom opp med.<br />
+            <br />
+            Ta gjerne kontakt om du lurer på noe.<br />
+        </div>
+        <div>
+            <br /><br />
+            <h4>Dato:  -  12-14/04/2026</h4>
+            <b>Timer:  -  2-3 timer</b><br />
+            <b>TLDR:  -  Litt før og etter møtet med Ti. / Tr. mandag 13.</b><br />
+            <b>Ting jeg har fått gjort:</b><br />
+            Gjorde ett forsøk på å se etter enkle programmerings oppgaver.<br />
+            Endte opp på boot.dev, og gjorde ferdig en hel masse 'enkle' programmerings oppgaver der. <br />
+            Men de har værken C# eller C++ på boot.dev, så det var egentlig litt bortkastet tid. <br />
+            Men greit nok for å bare skrive litt kode, selv om syntaksen var annerledes enn det jeg er vant til. <br />
+        </div>
+    </div>
+</details>
+
+

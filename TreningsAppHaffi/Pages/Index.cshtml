@@ -9,31 +9,76 @@
     <p>Benytt knappene over for å velge side(r)</p>
 </div>
 
-<p>Hello Word: 
-    <br />Simpel test side. Hello world. Opprettet så snart jeg hadde satt sammen dette prosjektet.</p>
-<p>SQL test: 
-    <br />Fortsatt litt under construction. Vil ta over for changelog siden etterhvert. Men mangler fortsatt litt funksjonalitet
-    <br />Todo: Slette ett og ett innlegg / passord så ikke hvemsomhelst kan slette alt ved ett uhell.
-    </p>
-<p>Changelog: 
-    <br />Mer som en dagbok over hva jeg har gjort med siden.
-    </p>
-<p>ETC: 
-    <br />Etc/Linker jeg ikke fant noe annet lurt sted for.</p>
-<br />
-<p>26/04/26: 
-    <br />Så langt viser dette egentlig bare at jeg har opprettet en enkel webside igjennom visual studio og azure.
-    <br />koden er for det meste enkel HTML og C# kode, knyttet til bruken av en enkel SQL database (som også ligger på azure).
-    <br />Det som har tatt mest tid er egentlig oppsettet og koblingen mellom Azure SQL serveren og nettsiden. Men jeg tror ting vil gå litt raskere fremover. 
-    <br />Samtidig er det ofte de 'små' tingene som tar lengst tid.
-    <br /> ---
-    <br />Ellers er det vel Changelog siden som har mest tekst. Bruker siden som en form for dagbok over hva jeg gjør. (Har planer om å gjøre SQL test siden til en mer 'dynamisk' changelog etterhvert. Men det er fortsatt ikke ferdig)
-    <br /> ---
-    <br />Mener selv at jeg har gjort det som står i oppgaveteksten fra TH. / CH.
-    <br />Dvs. Viser bruken av C#, Azure, AI, Etc. 
-    <br />(Ai er f.ex, mye enklere å spørre nå til dags en det var å søke svar via StackOverflow i sin tid).
-    <br />Men jeg har fortsatt planer om å leke meg med siden, og se hva annet jeg kan få til, inntill jeg går tom for ideer. Selv 'hvor mye tid' jeg har til dette prosjektet mitt kan variere en del.
-    <br /> ---
-    <br />Ha en videre fin dag!
-    <br />Mvh. Hafsteinn.
-</p>
+<div>
+    <br /><br />
+    <h3>17/08/2026 - Ny runde. Fokus på å få til testing.</h3>
+    <br />Jeg håper å få gjort følgende i løpet av de neste 10-12 dagene. Eventuelt sende det inn til code review hos CH- før veilederen min kommer tilbake fra sommer ferien 27 eller 28/08/2026.
+    <br />
+    <br />Jeg har ett google document med en oversikt over hva jeg har gjort & ønsker å gjøre her:
+    <br />https://docs.google.com/document/d/1swWuHPkl9pA_MCPXXSeX5EM2FePPHbIV-d0dxYKDro0/edit?usp=sharing
+    <br />Jeg vil fylle inn farger i kolonnene etterhvert, for å indikere status på de forskjellige punktene.
+    <br />(Grønn = Ferdig, Rød = Ikke startet, Blå = Ferdig + kommentar / tanke)
+    <br />
+    <br />Men for å oppsummere litt kort her på forsiden:
+    <br />1. Lage et lite design dokument for SQL siden & minesweeper siden. Blir nok eksterne google documenter jeg vil linke til her.
+    <br />2. Redesign av SQL siden. Implementer det jeg ser for meg å trenge. Fiks på det som er åpenbart (for meg) 'slappt' av design på SQL input/log siden.
+    <br />3. Les om testing: https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices
+    <br />4. Implementer og kjør testing rettet mot SQL siden min.
+    <br />5. dokumenter testingen (Enda ett google document, tenker jeg). Og forsøk å få rettet på eventuelle problemer som dukker opp.
+    <br />6. Fiks problemer jeg 'vet' jeg har/hadde på minesweeper siden.
+    <br />
+    <br /> --- Videre tanker:
+    <br /> Ellers ønsker jeg å se nærmere på hvordan jeg kan lage en 'brukerprofil' / logg inn funksjonalitet.
+    <br /> Les meg til om dette, sikkerhet når sånt implementeres. Enkrypsjon av data knyttet dette, når de sendes til og fra serveren/siden/etc. 
+    <br /> Evt Hva ansees om 'best practice' / hva er nødvendig / hvor mye sikkerhet kan du implementere før det egentlig er overkill/hensiktsløst å gjøre mer på en webside?
+    <br /> Jeg er bare litt nysgjerrig...
+</div>
+
+<details>
+    <br />
+    <summary><h3>- Klikk for å se -  Teksten som var på forsiden fra før sommeren.</h3></summary>
+
+    <div class="dropdown-content">
+        <p>
+            Hello Word:
+            <br />Simpel test side. Hello world. Opprettet så snart jeg hadde satt sammen dette prosjektet.
+        </p>
+
+        <p>
+            SQL test:
+            <br />Fortsatt litt under construction. Vil ta over for changelog siden etterhvert. Men mangler fortsatt litt funksjonalitet
+            <br />Todo: Slette ett og ett innlegg / passord så ikke hvemsomhelst kan slette alt ved ett uhell.
+        </p>
+
+        <p>
+            Changelog:
+            <br />Mer som en dagbok over hva jeg har gjort med siden.
+        </p>
+
+        <p>
+            ETC:
+            <br />Etc/Linker jeg ikke fant noe annet lurt sted for.
+        </p>
+
+        <br />
+
+        <p>
+            26/04/26:
+            <br />Så langt viser dette egentlig bare at jeg har opprettet en enkel webside igjennom visual studio og azure.
+            <br />koden er for det meste enkel HTML og C# kode, knyttet til bruken av en enkel SQL database (som også ligger på azure).
+            <br />Det som har tatt mest tid er egentlig oppsettet og koblingen mellom Azure SQL serveren og nettsiden. Men jeg tror ting vil gå litt raskere fremover.
+            <br />Samtidig er det ofte de 'små' tingene som tar lengst tid.
+            <br /> ---
+            <br />Ellers er det vel Changelog siden som har mest tekst. Bruker siden som en form for dagbok over hva jeg gjør. (Har planer om å gjøre SQL test siden til en mer 'dynamisk' changelog etterhvert. Men det er fortsatt ikke ferdig)
+            <br /> ---
+            <br />Mener selv at jeg har gjort det som står i oppgaveteksten fra TH. / CH.
+            <br />Dvs. Viser bruken av C#, Azure, AI, Etc.
+            <br />(Ai er f.ex, mye enklere å spørre nå til dags en det var å søke svar via StackOverflow i sin tid).
+            <br />Men jeg har fortsatt planer om å leke meg med siden, og se hva annet jeg kan få til, inntill jeg går tom for ideer. Selv 'hvor mye tid' jeg har til dette prosjektet mitt kan variere en del.
+            <br /> ---
+            <br />Ha en videre fin dag!
+            <br />Mvh. Hafsteinn.
+        </p>
+    </div>
+
+</details>
