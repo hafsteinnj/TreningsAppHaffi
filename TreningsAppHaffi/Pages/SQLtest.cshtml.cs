@@ -88,7 +88,7 @@ public class SQLtestModel : PageModel
     {
         var entry = new TestEntry
         {
-            CreatedDate = DateTime.Now,
+            CreatedDate = DateTime.UtcNow,
 
             // Intill jeg har implementert en login-funksjon, setter jeg UserId til 0. Dette kan være 'Gjest' i fremtiden.
             UserId = 0,

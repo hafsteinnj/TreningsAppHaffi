@@ -155,6 +155,14 @@
                 entryDiv.style.marginBottom = "10px";
 
                 const information = document.createElement("div");
+                const date = new Date(entry.createdDate + "Z");
+                const formattedDate = date.toLocaleString([], {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
 
                 information.innerHTML = `
                     <strong>Id:</strong>
@@ -180,7 +188,7 @@
 
                 information.querySelector(".entry-id").textContent = entry.id;
                 information.querySelector(".entry-user").textContent = entry.userId;
-                information.querySelector(".entry-date").textContent = entry.createdDate;
+                information.querySelector(".entry-date").textContent = formattedDate;
                 information.querySelector(".entry-job").textContent = entry.jobId;
                 information.querySelector(".entry-minutes").textContent = entry.minutes;
                 information.querySelector(".entry-description").textContent = entry.description;
