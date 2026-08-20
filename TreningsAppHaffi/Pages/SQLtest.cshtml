@@ -5,32 +5,66 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<!-- Knapp for å legge til en test- string i databasen
-<form method="post" onsubmit="handleSubmit(this)">
-    <button type="submit" id="insertBtn" asp-page-handler="Insert">
-        Insert Test Row
-    </button>
-
-    <span id="processingMessage" style="display:none; margin-left:10px;">
-        Processing...
-    </span>
-</form>
--->
+<div id="sqlStatus"
+     style="margin-bottom:15px; padding:10px; border:2px dashed #ccc;">
+    Connecting to SQL server...
+</div>
 
 <form method="post" onsubmit="handleSubmit(this)">
+
+    <!-- User -->
     <div>
+        <label>User: Guest</label>
+    </div>
+
+    <!-- Job -->
+    <div style="margin-top:10px;">
+        <label for="JobId">Type</label><br />
+        <select id="JobId" name="JobId">
+            <option value="0">ProsjektArbeid</option>
+            <option value="1">Jobb</option>
+            <option value="2">Fritid-Spill</option>
+            <option value="3">Fritid-Bok</option>
+            <option value="4">Fritid-Annet</option>
+        </select>
+    </div>
+
+    <!-- Minutes -->
+    <div style="margin-top:10px;">
+        <label for="Minutes">Tid brukt</label><br />
+        <select id="Minutes" name="Minutes">
+            <option value="0">0 minutter</option>
+            <option value="15">15 minutter</option>
+            <option value="30">30 minutter</option>
+            <option value="45">45 minutter</option>
+            <option value="60">1 time</option>
+            <option value="75">1 time 15 minutter</option>
+            <option value="90">1 time 30 minutter</option>
+            <option value="105">1 time 45 minutter</option>
+            <option value="120">2 timer</option>
+            <option value="135">2 timer 15 minutter</option>
+            <option value="150">2 timer 30 minutter</option>
+            <option value="165">2 timer 45 minutter</option>
+            <option value="180">3 timer</option>
+        </select>
+    </div>
+
+    <!-- Description -->
+    <div style="margin-top:10px;">
         <label for="Description">Oppsummering</label><br />
         <input type="text" id="Description" name="Description" required />
     </div>
 
+    <!-- Text -->
     <div style="margin-top:10px;">
         <label for="Text">Tekst / Beskrivelse</label><br />
         <textarea id="Text" name="Text" rows="5" cols="40" required></textarea>
     </div>
 
+    <!-- Submit -->
     <div style="margin-top:10px;">
-        <button type="submit" id="insertBtn" asp-page-handler="Insert">
-            Legg til i dagboken
+        <button type="submit" id="insertBtn" asp-page-handler="Insert" disabled>
+            -Lagre innlegg-
         </button>
 
         <span id="processingMessage" style="display:none; margin-left:10px;">
@@ -39,62 +73,159 @@
     </div>
 </form>
 
-
-<!-- Javascript for å vise "Processing..." og stopper evt bruker fra å klikke knappen flere ganger-->
-<script>
-    function handleSubmit(form) {
-        const button = document.getElementById("insertBtn");
-        const message = document.getElementById("processingMessage");
-
-        // Disable button
-        button.disabled = true;
-        button.innerText = "Inserting...";
-
-        // Show message
-        message.style.display = "inline";
-
-        // Allow form to continue submitting
-        return true;
-    }
-</script>
-
-<!-- Knapp for å rense innholdet i tabellen-->
-<form method="post">
-    <button type="submit" asp-page-handler="Clear">Clear Table</button>
-</form>
-
 <br />
 <br />
 
 <h3>Database SQL - Entries</h3>
 
-@if (Model.SqlEntries != null && Model.SqlEntries.Any())
-{
-    foreach (var entry in Model.SqlEntries)
-    {
-        <div style="margin-bottom:10px; padding:10px; border:1px solid #ccc;">
-            <strong>ID:</strong> @entry.Id <br />
-            <strong>Date:</strong> @entry.CreatedDate <br />
-            <strong>Description:</strong> @entry.Description <br />
-            <strong>Text:</strong> @entry.Text
-        </div>
+<div id="sqlEntries">
+    <p>Waiting for SQL server...</p>
+</div>
+
+<script>
+    let sqlConnected = false;
+    let retryDelay = 3000;
+    let connectionAttempts = 0;
+
+    async function checkSqlConnection() {
+
+        connectionAttempts++;
+
+        const status = document.getElementById("sqlStatus"); 
+        const button = document.getElementById("insertBtn");
+
+        button.disabled = true;
+
+        status.innerText = "Connecting to SQL server...";
+
+        try {
+            
+            const response = await fetch("?handler=CheckConnection"); 
+
+            if (!response.ok) { 
+                throw new Error( "Server returned an error." );
+            }
+
+            const result = await response.json();
+
+            if (result.connected) {
+
+                sqlConnected = true;
+                status.innerText = "Connected to SQL server.";
+                button.disabled = false;
+                loadEntries();
+            } else {
+                sqlConnected = false;
+                status.innerText = "Connection timed out. Retrying in " + (retryDelay / 1000) + " seconds... Attempt #" + connectionAttempts;
+                setTimeout(checkSqlConnection, retryDelay);
+            }
+        } catch (error) {
+            sqlConnected = false;
+            status.innerText = "Unable to connect to SQL server. Retrying in " + (retryDelay / 1000) + " seconds... Attempt #" + connectionAttempts;
+            setTimeout(checkSqlConnection, retryDelay);
+        }
     }
-}
-else
-{
-    <p>No entries found.</p>
-}
 
-<br />
-<br />
+    async function loadEntries() {
 
-<p>
-    Her har jeg tenkt å lage en liten SQL dagbok. Jeg ønsker å starte med noe helt simpelt.<br />
-    Legg til, Slett, Oppdater og Hent data fra en database. Jeg har tenkt å bruke AzureSQL server.<br />
-    Tanken er å kun ha 1 tabell, med ID, Navn, Dato, og Beskrivelse. Det skal være en enkel treningsdagbok.
-</p>
-<p>
-    Etter at jeg har laget den <i>enkle</i> databasen, Så har jeg tenkt å lage enda en SQL side hvor jeg prøver å lage et fiksjonelt program for å reservere noe.<br />
-    Fex, reservere vaskemaskiner, bord, eller noe annet.<br />
-    Tanken er at jeg må ha en tabell for brukere og en annen tabell for det som skal reserveres.
-</p>
+        const container = document.getElementById("sqlEntries");
+
+        try {
+
+            const response = await fetch("?handler=Entries");
+
+            if (!response.ok) {
+                return;
+            }
+
+            const entries = await response.json();
+
+            container.innerHTML = "";
+
+            if (entries.length === 0) {
+                container.innerHTML = "<p>No entries found.</p>";
+                return;
+            }
+
+            entries.forEach(entry => {
+                const entryDiv = document.createElement("div");
+
+                entryDiv.style.border = "1px solid #ccc";
+                entryDiv.style.padding = "10px";
+                entryDiv.style.marginBottom = "10px";
+
+                const information = document.createElement("div");
+
+                information.innerHTML = `
+                    <strong>Id:</strong>
+                    <span class="entry-id"></span>
+
+                    <strong>User:</strong>
+                    <span class="entry-user"></span>
+
+                    <strong>Date:</strong>
+                    <span class="entry-date"></span>
+                    <br />
+
+                    <strong>Job:</strong>
+                    <span class="entry-job"></span>
+
+                    <strong>Minutes:</strong>
+                    <span class="entry-minutes"></span>
+                    <br />
+
+                    <strong>Description:</strong>
+                    <span class="entry-description"></span>
+                `;
+
+                information.querySelector(".entry-id").textContent = entry.id;
+                information.querySelector(".entry-user").textContent = entry.userId;
+                information.querySelector(".entry-date").textContent = entry.createdDate;
+                information.querySelector(".entry-job").textContent = entry.jobId;
+                information.querySelector(".entry-minutes").textContent = entry.minutes;
+                information.querySelector(".entry-description").textContent = entry.description;
+                entryDiv.appendChild(information);
+
+                const textDiv = document.createElement("div");
+                    textDiv.style.marginBottom = "2px";
+                    textDiv.style.padding = "2px";
+                    textDiv.style.border = "1px solid #ccc";
+                    textDiv.style.whiteSpace = "pre-wrap"; // for linebreaks og lignende
+
+                const textLabel = document.createElement("strong");
+                    textLabel.textContent = "Text: ";
+                    textDiv.appendChild(textLabel);
+
+                const textContent = document.createElement("span");
+                    textContent.textContent = entry.text;
+                    textDiv.appendChild(textContent);
+
+                entryDiv.appendChild(textDiv);
+
+                container.appendChild(entryDiv);
+            });
+
+
+        } catch (error) {
+            container.innerHTML = "<p>Error loading entries.</p>";
+        }
+    }
+
+    function handleSubmit(form) {
+
+        if(!sqlConnected) {
+            return false;
+        }
+
+        const button = document.getElementById("insertBtn");
+        const processingMessage = document.getElementById("processingMessage");
+        button.disabled = true;
+        button.innerText = "Inserting...";
+        processingMessage.style.display = "inline";
+
+        return true;
+    }
+
+    checkSqlConnection();
+
+</script>
