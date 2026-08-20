@@ -196,20 +196,18 @@
 
                 const textDiv = document.createElement("div");
                     textDiv.style.marginBottom = "2px";
-                    textDiv.style.padding = "2px";
-                    textDiv.style.border = "1px solid #ccc";
+                    textDiv.style.paddingLeft = "10px";
+                    textDiv.style.borderLeft = "5px solid #ccc";
                     textDiv.style.whiteSpace = "pre-wrap"; // for linebreaks og lignende
-
                 const textLabel = document.createElement("strong");
-                    textLabel.textContent = "Text: ";
+                    textLabel.textContent = "Text:";
                     textDiv.appendChild(textLabel);
-
+                    textDiv.appendChild(document.createElement("br")); // Vil ha linjeskift etter Text:
                 const textContent = document.createElement("span");
                     textContent.textContent = entry.text;
                     textDiv.appendChild(textContent);
 
                 entryDiv.appendChild(textDiv);
-
                 container.appendChild(entryDiv);
             });
 
