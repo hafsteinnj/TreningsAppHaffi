@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="TreningsAppHaffi.Tests/TreningsAppHaffi.Tests.csproj" Id="cd02f6df-ec73-4cd2-8563-f9b69069a47d" />
   <Project Path="TreningsAppHaffi/TreningsAppHaffi.csproj" />
 </Solution>
