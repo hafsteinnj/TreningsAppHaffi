@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TreningsAppHaffi.Data;
 
@@ -14,15 +15,21 @@ public class SQLtestModel : PageModel
     public List<TestEntry> SqlEntries { get; set; } = new(); // to squelch warning.
 
     [BindProperty]
-    public string Description { get; set; } = string.Empty; // to squelch warning.
+    [Required(ErrorMessage = "Oppsummering er påkrevd.")]
+    [MaxLength(100, ErrorMessage = "Oppsummering kan ikke være lengre enn 100 tegn.")]
+    public string Description { get; set; } = string.Empty;
 
     [BindProperty]
-    public string Text { get; set; } = string.Empty; // to squelch warning.
+    [Required(ErrorMessage = "Tekst er påkrevd.")]
+    [MaxLength(800, ErrorMessage = "Tekst kan ikke være lengre enn 800 tegn.")]
+    public string Text { get; set; } = string.Empty;
 
     [BindProperty]
+    [Range(0, 4, ErrorMessage = "Ugyldig type valgt.")]
     public int JobId { get; set; }
 
     [BindProperty]
+    [Range(0, 180, ErrorMessage = "Ugyldig tidsbruk valgt.")]
     public int Minutes { get; set; }
 
     public SQLtestModel(MyDatabaseContext context)
@@ -84,8 +91,13 @@ public class SQLtestModel : PageModel
         }
     }
 
-    public IActionResult OnPostInsert()
+    public async Task<IActionResult> OnPostInsertAsync()
     {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
         var entry = new TestEntry
         {
             CreatedDate = DateTime.UtcNow,
@@ -103,9 +115,9 @@ public class SQLtestModel : PageModel
         };
 
         _context.TestEntries.Add(entry);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        return RedirectToPage(); 
+        return RedirectToPage();
         // reloads and triggers OnGet(), - oppdaterer SqlEntries-listen på siden.
     }
 }

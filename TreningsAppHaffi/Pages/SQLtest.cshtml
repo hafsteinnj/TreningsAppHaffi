@@ -12,6 +12,8 @@
 
 <form method="post" onsubmit="handleSubmit(this)">
 
+    <div asp-validation-summary="ModelOnly" style="color:#c00; margin-bottom:10px;"></div>
+
     <!-- User -->
     <div>
         <label>User: Guest</label>
@@ -51,14 +53,16 @@
 
     <!-- Description -->
     <div style="margin-top:10px;">
-        <label for="Description">Oppsummering</label><br />
-        <input type="text" id="Description" name="Description" required />
+        <label asp-for="Description">Oppsummering</label><br />
+        <input asp-for="Description" />
+        <span asp-validation-for="Description" style="color:#c00; display:block;"></span>
     </div>
 
     <!-- Text -->
     <div style="margin-top:10px;">
-        <label for="Text">Tekst / Beskrivelse</label><br />
-        <textarea id="Text" name="Text" rows="5" cols="40" required></textarea>
+        <label asp-for="Text">Tekst / Beskrivelse</label><br />
+        <textarea asp-for="Text" rows="5" cols="40"></textarea>
+        <span asp-validation-for="Text" style="color:#c00; display:block;"></span>
     </div>
 
     <!-- Submit -->
@@ -91,7 +95,7 @@
 
         connectionAttempts++;
 
-        const status = document.getElementById("sqlStatus"); 
+        const status = document.getElementById("sqlStatus");
         const button = document.getElementById("insertBtn");
 
         button.disabled = true;
@@ -99,11 +103,11 @@
         status.innerText = "Connecting to SQL server...";
 
         try {
-            
-            const response = await fetch("?handler=CheckConnection"); 
 
-            if (!response.ok) { 
-                throw new Error( "Server returned an error." );
+            const response = await fetch("?handler=CheckConnection");
+
+            if (!response.ok) {
+                throw new Error("Server returned an error.");
             }
 
             const result = await response.json();
@@ -157,34 +161,34 @@
                 const information = document.createElement("div");
                 const date = new Date(entry.createdDate + "Z");
                 const formattedDate = date.toLocaleString([], {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    });
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
 
                 information.innerHTML = `
-                    <strong>Id:</strong>
-                    <span class="entry-id"></span>
+                        <strong>Id:</strong>
+                        <span class="entry-id"></span>
 
-                    <strong>User:</strong>
-                    <span class="entry-user"></span>
+                        <strong>User:</strong>
+                        <span class="entry-user"></span>
 
-                    <strong>Date:</strong>
-                    <span class="entry-date"></span>
-                    <br />
+                        <strong>Date:</strong>
+                        <span class="entry-date"></span>
+                        <br />
 
-                    <strong>Job:</strong>
-                    <span class="entry-job"></span>
+                        <strong>Job:</strong>
+                        <span class="entry-job"></span>
 
-                    <strong>Minutes:</strong>
-                    <span class="entry-minutes"></span>
-                    <br />
+                        <strong>Minutes:</strong>
+                        <span class="entry-minutes"></span>
+                        <br />
 
-                    <strong>Description:</strong>
-                    <span class="entry-description"></span>
-                `;
+                        <strong>Description:</strong>
+                        <span class="entry-description"></span>
+                    `;
 
                 information.querySelector(".entry-id").textContent = entry.id;
                 information.querySelector(".entry-user").textContent = entry.userId;
@@ -195,17 +199,17 @@
                 entryDiv.appendChild(information);
 
                 const textDiv = document.createElement("div");
-                    textDiv.style.marginBottom = "2px";
-                    textDiv.style.paddingLeft = "10px";
-                    textDiv.style.borderLeft = "5px solid #ccc";
-                    textDiv.style.whiteSpace = "pre-wrap"; // for linebreaks og lignende
+                textDiv.style.marginBottom = "2px";
+                textDiv.style.paddingLeft = "10px";
+                textDiv.style.borderLeft = "5px solid #ccc";
+                textDiv.style.whiteSpace = "pre-wrap"; // for linebreaks og lignende
                 const textLabel = document.createElement("strong");
-                    textLabel.textContent = "Text:";
-                    textDiv.appendChild(textLabel);
-                    textDiv.appendChild(document.createElement("br")); // Vil ha linjeskift etter Text:
+                textLabel.textContent = "Text:";
+                textDiv.appendChild(textLabel);
+                textDiv.appendChild(document.createElement("br")); // Vil ha linjeskift etter Text:
                 const textContent = document.createElement("span");
-                    textContent.textContent = entry.text;
-                    textDiv.appendChild(textContent);
+                textContent.textContent = entry.text;
+                textDiv.appendChild(textContent);
 
                 entryDiv.appendChild(textDiv);
                 container.appendChild(entryDiv);
@@ -219,7 +223,7 @@
 
     function handleSubmit(form) {
 
-        if(!sqlConnected) {
+        if (!sqlConnected) {
             return false;
         }
 
