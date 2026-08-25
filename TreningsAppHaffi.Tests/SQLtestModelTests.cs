@@ -9,7 +9,7 @@ namespace TreningsAppHaffi.Tests
     public class SQLtestModelTests
     {
         [Fact]
-        public void OnPostInsert_SetsHiddenToFalse()
+        public async Task OnPostInsert_SetsHiddenToFalse()
         {
             /*
              * Gjort som en lengre oppgave med detaljerte beskrivelser av ChatGPT.
@@ -34,7 +34,7 @@ namespace TreningsAppHaffi.Tests
             model.Minutes = 30;
 
             // Act
-            model.OnPostInsert();
+            await model.OnPostInsertAsync();
             var entry = context.TestEntries.Single();
 
             // Assert
@@ -117,7 +117,7 @@ namespace TreningsAppHaffi.Tests
         // (e.g. Description and Text accidentally swapped) that the Hidden-only
         // assertion would never catch.
         [Fact]
-        public void OnPostInsert_MapsAllBoundPropertiesCorrectly()
+        public async Task OnPostInsert_MapsAllBoundPropertiesCorrectly()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<MyDatabaseContext>()
@@ -133,7 +133,7 @@ namespace TreningsAppHaffi.Tests
             model.Minutes = 15;
 
             // Act
-            model.OnPostInsert();
+            await model.OnPostInsertAsync();
             var entry = context.TestEntries.Single();
 
             // Assert
