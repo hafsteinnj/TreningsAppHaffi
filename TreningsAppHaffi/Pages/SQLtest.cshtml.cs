@@ -11,13 +11,13 @@ namespace TreningsAppHaffi.Pages;
 public class SQLtestModel : PageModel
 {
     private readonly MyDatabaseContext _context;
-    public List<TestEntry> SqlEntries { get; set; }
+    public List<TestEntry> SqlEntries { get; set; } = new(); // to squelch warning.
 
     [BindProperty]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty; // to squelch warning.
 
     [BindProperty]
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty; // to squelch warning.
 
     [BindProperty]
     public int JobId { get; set; }
@@ -107,14 +107,5 @@ public class SQLtestModel : PageModel
 
         return RedirectToPage(); 
         // reloads and triggers OnGet(), - oppdaterer SqlEntries-listen på siden.
-    }
-
-    public IActionResult OnPostClear()
-    {
-        var allEntries = _context.TestEntries.ToList();
-        _context.TestEntries.RemoveRange(allEntries);
-        _context.SaveChanges();
-
-        return RedirectToPage();
     }
 }

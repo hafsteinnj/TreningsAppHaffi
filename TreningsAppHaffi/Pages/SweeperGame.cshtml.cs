@@ -7,7 +7,7 @@ namespace TreningsAppHaffi.Pages
 {
     public class SweeperGameModel : PageModel
     {
-        private const string SessionKey = "SweeperGameState";
+        private const string SessionKey = "SweeperGameState"; //Hvis den endres, Vil OnGet_CorruptedSessionPayload_FallsBackToNewGame faile uten lyd.
 
         public int Width { get; private set; } = 12;
         public int Height { get; private set; } = 10;
