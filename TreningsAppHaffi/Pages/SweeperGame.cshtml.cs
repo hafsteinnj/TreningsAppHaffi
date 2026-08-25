@@ -1,236 +1,285 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 using TreningsAppHaffi.Data;
 
 namespace TreningsAppHaffi.Pages
 {
     public class SweeperGameModel : PageModel
     {
-        //Forsøk nr 2 fra chatgpt,
-        //Får se om koden krasjer denne gangen.
-        private static SweeperCell[,] Grid;
+        private const string SessionKey = "SweeperGameState";
 
-        public int Width { get; set; } = 12;
-        public int Height { get; set; } = 10;
-        public int MineCount { get; set; }
+        public int Width { get; private set; } = 12;
+        public int Height { get; private set; } = 10;
+        public int MineCount { get; private set; }
+        public bool GameOver { get; private set; }
+        public bool GameWon { get; private set; }
+        public bool FlagMode { get; private set; }
+        public int ElapsedSeconds { get; private set; }
+        public bool Locked => GameOver || GameWon;
+        public string ElapsedDisplay => $"{ElapsedSeconds / 60:00}:{ElapsedSeconds % 60:00}";
 
-        public bool GameOver { get; set; }
-        public bool GameWon { get; set; }
-        public bool FirstClick { get; set; } = true;
+        private List<SweeperCell> _cells = new();
 
-        public SweeperCell[,] GameGrid => Grid;
+        public SweeperCell GetCell(int x, int y) => _cells[y * Width + x];
 
         public void OnGet()
         {
-            InitializeGame();
+            var state = LoadState();
+            if (state == null)
+            {
+                state = CreateNewGame(Width, Height);
+                SaveState(state);
+            }
+            ApplyState(state);
         }
 
         public IActionResult OnPostNewGame()
         {
-            InitializeGame();
-            return Page();
+            SaveState(CreateNewGame(Width, Height));
+            return RedirectToPage();
         }
 
-        private void InitializeGame()
+        public IActionResult OnPostToggleFlagMode()
         {
-            Width = Math.Clamp(Width, 4, 20);
-            Height = Math.Clamp(Height, 4, 20);
-
-            Grid = new SweeperCell[Width, Height];
-
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
-                    Grid[x, y] = new SweeperCell();
-
-            MineCount = Math.Max(1, (Width * Height) / 4);
-
-            PlaceMines();
-            CalculateAdjacents();
-
-            GameOver = false;
-            GameWon = false;
-            FirstClick = true;
+            var state = LoadState() ?? CreateNewGame(Width, Height);
+            if (!state.GameOver && !state.GameWon)
+                state.FlagMode = !state.FlagMode;
+            SaveState(state);
+            return RedirectToPage();
         }
 
         public IActionResult OnPostReveal(int x, int y)
         {
-            if (GameOver || GameWon)
-                return Page();
+            var state = LoadState();
+            if (state == null)
+            {
+                SaveState(CreateNewGame(Width, Height));
+                return RedirectToPage();
+            }
 
-            var cell = Grid[x, y];
+            if (state.GameOver || state.GameWon || !InBounds(state, x, y))
+            {
+                return RedirectToPage();
+            }
 
+            var cell = state.Cells[y * state.Width + x];
+
+            // Flag mode: left click toggles a flag, never reveals.
+            if (state.FlagMode)
+            {
+                if (!cell.IsRevealed)
+                    cell.IsFlagged = !cell.IsFlagged;
+
+                SaveState(state);
+                return RedirectToPage();
+            }
+
+            // Flagged cells ignore normal clicks until un-flagged.
             if (cell.IsFlagged || cell.IsRevealed)
-                return Page();
+            {
+                return RedirectToPage();
+            }
 
-            if (FirstClick)
-                FirstClick = false;
+            // First click of the game: place mines now, guaranteed not on (x, y).
+            if (state.FirstClick)
+            {
+                PlaceMines(state, x, y);
+                CalculateAdjacents(state);
+                state.FirstClick = false;
+                state.StartTimeUtc = DateTime.UtcNow;
+            }
 
             if (cell.IsMine)
             {
                 cell.IsRevealed = true;
-                GameOver = true;
-                return Page();
+                state.GameOver = true;
+                state.FinalElapsedSeconds = GetElapsedSeconds(state);
+            }
+            else
+            {
+                RevealRecursive(state, x, y);
+
+                if (CheckWin(state))
+                {
+                    state.GameWon = true;
+                    state.FinalElapsedSeconds = GetElapsedSeconds(state);
+                }
             }
 
-            RevealRecursive(x, y);
-
-            CheckWin();
-
-            return Page();
+            SaveState(state);
+            return RedirectToPage();
         }
 
-        // Plaserer miner tilfeldig. Men prøver å unngå å plassere miner i 3x3 grid / clusters.
-        private void PlaceMines()
+        // ----- session load/save -----
+
+        private GameState? LoadState()
+        {
+            var json = HttpContext.Session.GetString(SessionKey);
+            if (string.IsNullOrEmpty(json)) return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<GameState>(json);
+            }
+            catch
+            {
+                return null; // corrupted/old session payload - treat as no game yet
+            }
+        }
+
+        private void SaveState(GameState state)
+        {
+            HttpContext.Session.SetString(SessionKey, JsonSerializer.Serialize(state));
+        }
+
+        private void ApplyState(GameState state)
+        {
+            Width = state.Width;
+            Height = state.Height;
+            MineCount = state.MineCount;
+            GameOver = state.GameOver;
+            GameWon = state.GameWon;
+            FlagMode = state.FlagMode;
+            _cells = state.Cells;
+            ElapsedSeconds = (int)GetElapsedSeconds(state);
+        }
+
+        private double GetElapsedSeconds(GameState state)
+        {
+            if (state.FinalElapsedSeconds.HasValue)
+                return state.FinalElapsedSeconds.Value;
+
+            if (state.StartTimeUtc.HasValue)
+                return (DateTime.UtcNow - state.StartTimeUtc.Value).TotalSeconds;
+
+            return 0;
+        }
+
+        // ----- game setup / rules -----
+
+        private GameState CreateNewGame(int width, int height)
+        {
+            width = Math.Clamp(width, 4, 20);
+            height = Math.Clamp(height, 4, 20);
+
+            var state = new GameState
+            {
+                Width = width,
+                Height = height,
+                MineCount = Math.Max(1, (width * height) / 4),
+                Cells = new List<SweeperCell>(width * height)
+            };
+
+            for (int i = 0; i < width * height; i++)
+                state.Cells.Add(new SweeperCell());
+
+            return state;
+        }
+
+        private bool InBounds(GameState state, int x, int y)
+            => x >= 0 && x < state.Width && y >= 0 && y < state.Height;
+
+        // Places mines, skipping (safeX, safeY) so the first click is never a mine,
+        // and avoiding dense 3x3 clusters like the original logic did.
+        private void PlaceMines(GameState state, int safeX, int safeY)
         {
             var rand = new Random();
             int placed = 0;
 
-            while (placed < MineCount)
+            while (placed < state.MineCount)
             {
-                int x = rand.Next(Width);
-                int y = rand.Next(Height);
+                int x = rand.Next(state.Width);
+                int y = rand.Next(state.Height);
 
-                if (Grid[x, y].IsMine)
-                    continue;
+                if (x == safeX && y == safeY) continue;
 
-                // Prevent 3x3 full mine clusters
-                if (WouldCreateDenseCluster(x, y))
-                    continue;
+                var cell = state.Cells[y * state.Width + x];
+                if (cell.IsMine) continue;
 
-                Grid[x, y].IsMine = true;
+                if (WouldCreateDenseCluster(state, x, y)) continue;
+
+                cell.IsMine = true;
                 placed++;
             }
         }
 
-        private bool WouldCreateDenseCluster(int x, int y)
+        private bool WouldCreateDenseCluster(GameState state, int x, int y)
         {
             int mines = 0;
 
             for (int dx = -1; dx <= 1; dx++)
                 for (int dy = -1; dy <= 1; dy++)
                 {
-                    int nx = x + dx;
-                    int ny = y + dy;
-
-                    if (InBounds(nx, ny) && Grid[nx, ny].IsMine)
+                    int nx = x + dx, ny = y + dy;
+                    if (InBounds(state, nx, ny) && state.Cells[ny * state.Width + nx].IsMine)
                         mines++;
                 }
 
-            return mines >= 5; // tweak threshold
+            return mines >= 5;
         }
 
-        // kalkulerer antall miner rundt hver celle
-        private void CalculateAdjacents()
+        private void CalculateAdjacents(GameState state)
         {
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            for (int x = 0; x < state.Width; x++)
+                for (int y = 0; y < state.Height; y++)
                 {
-                    if (Grid[x, y].IsMine) continue;
+                    var cell = state.Cells[y * state.Width + x];
+                    if (cell.IsMine) continue;
 
                     int count = 0;
-
                     for (int dx = -1; dx <= 1; dx++)
                         for (int dy = -1; dy <= 1; dy++)
                         {
-                            int nx = x + dx;
-                            int ny = y + dy;
-
-                            if (InBounds(nx, ny) && Grid[nx, ny].IsMine)
+                            int nx = x + dx, ny = y + dy;
+                            if (InBounds(state, nx, ny) && state.Cells[ny * state.Width + nx].IsMine)
                                 count++;
                         }
 
-                    Grid[x, y].AdjacentMines = count;
+                    cell.AdjacentMines = count;
                 }
         }
 
-        //flood fill logikk for å avsløre alle tilstøtende celler uten miner
-        private void RevealRecursive(int x, int y)
+        private void RevealRecursive(GameState state, int x, int y)
         {
-            if (!InBounds(x, y))
-                return;
+            if (!InBounds(state, x, y)) return;
 
-            var cell = Grid[x, y];
-
-            if (cell.IsRevealed || cell.IsFlagged)
-                return;
+            var cell = state.Cells[y * state.Width + x];
+            if (cell.IsRevealed || cell.IsFlagged) return;
 
             cell.IsRevealed = true;
 
-            // STOP condition:
-            // If this cell has adjacent mines, do NOT continue spreading
-            if (cell.AdjacentMines > 0)
-                return;
+            if (cell.AdjacentMines > 0) return;
 
-            // Otherwise, expand to all neighbors
             for (int dx = -1; dx <= 1; dx++)
                 for (int dy = -1; dy <= 1; dy++)
                 {
                     if (dx == 0 && dy == 0) continue;
-                    RevealRecursive(x + dx, y + dy);
+                    RevealRecursive(state, x + dx, y + dy);
                 }
         }
 
-        //win condition: alle ikke-miner er avslørt
-        private void CheckWin()
+        private bool CheckWin(GameState state)
         {
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
-                {
-                    var c = Grid[x, y];
+            foreach (var c in state.Cells)
+                if (!c.IsMine && !c.IsRevealed) return false;
 
-                    if (!c.IsMine && !c.IsRevealed)
-                        return;
-                }
-
-            GameWon = true;
+            return true;
         }
 
-        // Ting chatgpt *host* glemte...
-        private bool InBounds(int x, int y)
+        // Serializable per-user game state, stored as JSON in Session.
+        private class GameState
         {
-            return x >= 0 && x < Width &&
-                   y >= 0 && y < Height;
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public int MineCount { get; set; }
+            public bool GameOver { get; set; }
+            public bool GameWon { get; set; }
+            public bool FlagMode { get; set; }
+            public bool FirstClick { get; set; } = true;
+            public DateTime? StartTimeUtc { get; set; }
+            public double? FinalElapsedSeconds { get; set; }
+            public List<SweeperCell> Cells { get; set; } = new();
         }
-
-        //flagging av celler
-        public IActionResult OnPostToggleFlag(int x, int y)
-        {
-            var cell = Grid[x, y];
-
-            if (!cell.IsRevealed)
-                cell.IsFlagged = !cell.IsFlagged;
-
-            //return Page(); //dette skapte problemer når siden var lastet opp i azure.
-            /*
-             * The browser tries to reload the page
-                But the last request was a POST → browser says:
-                “If I reload, I’ll repeat that POST. Are you sure?”
-                That’s the “resend form data” warning you’re seeing in Firefox.
-
-            Why Azure makes it worse
-            Locally, browsers sometimes behave more forgivingly.
-
-                On Azure:
-                stricter request handling
-                full round-trip latency
-                no cached state
-
-                → so the POST + reload pattern becomes unreliable
-
-
-            The correct pattern (Post-Redirect-Get)
-
-                In web apps, you should never return a Page() after POST if the user might refresh.
-                Instead:
-
-                POST → Redirect → GET
-
-            Se gjerne samtalen jeg har med chatgpt om dette her: https://docs.google.com/document/d/15MGG57hWhO_1JxQmzfQTw3E9qkvajaEqVVgkiZAWgWk/edit?usp=sharing
-            (coppy paste noe av teksten over og search)
-             */
-
-            return RedirectToPage(); // ✅ converts flow to GET
-        }
-
     }
 }

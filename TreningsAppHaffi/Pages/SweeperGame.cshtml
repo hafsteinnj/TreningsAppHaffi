@@ -1,28 +1,7 @@
 ﻿@page
 @model TreningsAppHaffi.Pages.SweeperGameModel
 
-<!-- alternativ som ikke funket helt.
-<style id="u3t8n4">
-    #grid {
-        display: inline-block;
-    }
-
-    .row {
-        display: flex;
-    }
-
-    .cell {
-        width: 30px;
-        height: 30px;
-        margin: 1px;
-        padding: 0;
-        text-align: center;
-        vertical-align: middle;
-    }
-</style>
--->
-
-<style id="b1jvmp">
+<style>
     .cell {
         width: 30px;
         height: 30px;
@@ -33,75 +12,131 @@
         cursor: pointer;
     }
 
-    /* 👇 Unrevealed (default button look) */
-.cell:not(.revealed) {
-    box-shadow: inset -2px -2px 0 #888, inset 2px 2px 0 #fff;
-}
+        .cell:not(.revealed):not(:disabled) {
+            box-shadow: inset -2px -2px 0 #888, inset 2px 2px 0 #fff;
+        }
 
-.cell:not(.revealed):hover {
-    background-color: #eee;
-}
+            .cell:not(.revealed):not(:disabled):hover {
+                background-color: #eee;
+            }
 
-/* 👇 Revealed cells (flat look) */
-.cell.revealed {
-    background-color: #bdbdbd;
-    border: 1px solid #999;
-    box-shadow: none;
-    cursor: default;
-}
+        .cell.revealed {
+            background-color: #bdbdbd;
+            border: 1px solid #999;
+            box-shadow: none;
+            cursor: default;
+        }
 
-/* 💣 Mine */
-.cell.mine {
-    background-color: #e57373;
-    color: black;
-}
+        .cell.mine {
+            background-color: #e57373;
+            color: black;
+        }
 
-/* 🚩 Flag */
-.cell.flag {
-    background-color: #fff176;
-}
+        .cell.flag {
+            background-color: #fff176;
+        }
 
-/* 🔢 Number colors (classic style) */
-.cell.n1 { color: blue; }
-.cell.n2 { color: green; }
-.cell.n3 { color: red; }
-.cell.n4 { color: darkblue; }
-.cell.n5 { color: brown; }
-.cell.n6 { color: teal; }
-.cell.n7 { color: black; }
-.cell.n8 { color: gray; }
+        .cell:disabled {
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .cell.n1 {
+            color: blue;
+        }
+
+        .cell.n2 {
+            color: green;
+        }
+
+        .cell.n3 {
+            color: red;
+        }
+
+        .cell.n4 {
+            color: darkblue;
+        }
+
+        .cell.n5 {
+            color: brown;
+        }
+
+        .cell.n6 {
+            color: teal;
+        }
+
+        .cell.n7 {
+            color: black;
+        }
+
+        .cell.n8 {
+            color: gray;
+        }
+
+    #controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    #newGameBtn.attention {
+        font-weight: 900;
+        border: 3px solid #d32f2f;
+    }
+
+    #flagModeBtn.active {
+        box-shadow: inset -2px -2px 0 #888, inset 2px 2px 0 #fff;
+        background-color: #fff176;
+    }
+
+    #timer {
+        font-weight: bold;
+    }
 </style>
 
-<p>UNDER CONSTRUCTION - OBS - Mine sweeperen funker nå, men høyreklikk for å markere flagg funker ikke enda. Men jeg regner med å få det til før møtet med trond på torsdag.
-    <br/><s>Ting krasjer pga noe tull i AI-koden. Så jeg må gå igjenom koden for å finne ut hva som skjer.</s><br/></p>
-
+<p>
+    UNDER CONSTRUCTION - OBS - Minesweeperen funker nå, inkludert flagging (via flagg-knappen, ikke høyreklikk),
+    timer, og game over/win-tilstand.
+</p>
 
 <form method="post">
-    <button asp-page-handler="NewGame">New Game</button>
-</form>
+    <div id="controls">
+        <button id="newGameBtn"
+                type="submit"
+                formaction="?handler=NewGame"
+                class="@(Model.Locked ? "attention" : "")">
+            New Game
+        </button>
 
-<div id="grid"
-     style="display:grid; grid-template-columns: repeat(@Model.Width, 30px);">
+        <button id="flagModeBtn"
+                type="submit"
+                formaction="?handler=ToggleFlagMode"
+                disabled="@Model.Locked"
+                class="@(Model.FlagMode ? "active" : "")"
+                title="Toggle flag placement mode">
+            🚩 Flag mode: @(Model.FlagMode ? "ON" : "OFF")
+        </button>
 
-    @for (int y = 0; y < Model.Height; y++)
-    {
-        for (int x = 0; x < Model.Width; x++)
+        <div id="timer">@Model.ElapsedDisplay</div>
+    </div>
+
+    <div id="grid" style="display:grid; grid-template-columns: repeat(@Model.Width, 30px);">
+        @for (int y = 0; y < Model.Height; y++)
         {
-            var cell = Model.GameGrid[x, y];
+            for (int x = 0; x < Model.Width; x++)
+            {
+                var cell = Model.GetCell(x, y);
+                bool cellDisabled = Model.Locked || cell.IsRevealed || (cell.IsFlagged && !Model.FlagMode);
 
-            <form method="post" style="display:inline;">
-                <input type="hidden" name="x" value="@x" />
-                <input type="hidden" name="y" value="@y" />
-
-                <button formaction="?handler=Reveal"
-                        onclick="@( (!cell.IsRevealed && !cell.IsFlagged) ? "startTimer()" : "" )"
-                        oncontextmenu="flag(event, @x, @y)"
+                <button type="submit"
+                        formaction="?handler=Reveal&x=@x&y=@y"
+                        disabled="@cellDisabled"
                         class="cell
-                               @(cell.IsRevealed ? "revealed" : "")
-                               @(cell.IsMine && cell.IsRevealed ? "mine" : "")
-                               @(cell.IsFlagged ? "flag" : "")
-                               @(cell.AdjacentMines > 0 && cell.IsRevealed ? $"n{cell.AdjacentMines}" : "")">
-
+                    @(cell.IsRevealed ? "revealed" : "")
+                    @(cell.IsMine && cell.IsRevealed ? "mine" : "")
+                    @(cell.IsFlagged ? "flag" : "")
+                    @(cell.AdjacentMines > 0 && cell.IsRevealed ? $"n{cell.AdjacentMines}" : "")">
                     @if (cell.IsRevealed)
                     {
                         if (cell.IsMine)
@@ -118,10 +153,10 @@
                         <span>!</span>
                     }
                 </button>
-            </form>
+            }
         }
-    }
-</div>
+    </div>
+</form>
 
 @if (Model.GameOver)
 {
@@ -132,64 +167,22 @@
     <h2>You Won!</h2>
 }
 
-<!-- Flagging av celler // old js, fra første runden med chatgpt.
 <script>
-    document.addEventListener("contextmenu", function (e) {
-        if (e.target.tagName === "BUTTON") {
-            e.preventDefault();
+    // Ticks the displayed timer between postbacks. Re-synced to the real,
+    // server-tracked elapsed time on every page load, so it can't drift -
+    // it's purely visual between clicks.
+    (function() {
+        let seconds = @Model.ElapsedSeconds;
+        const el = document.getElementById("timer");
+        const running = @(Model.Locked ? "false" : "true");
 
-            const form = e.target.closest("form");
-            form.action += "?handler=ToggleFlag";
-            form.submit();
+        if (running) {
+            setInterval(() => {
+                seconds++;
+                const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+                const s = String(seconds % 60).padStart(2, "0");
+                el.textContent = `${m}:${s}`;
+            }, 1000);
         }
-    });
-</script>
--->
-
-<script>
-    function flag(e, x, y) {
-        e.preventDefault();
-
-        fetch(`?handler=ToggleFlag&x=${x}&y=${y}`, {
-            method: "POST"
-        }).then(() => location.reload());
-    }
-</script>
-
-<!-- Timer / JScript 
-<span id="timer">00:00</span>
-
-<script>
-    let seconds = 0;
-
-    setInterval(() => {
-        if (seconds < 5999) {
-            seconds++;
-            let m = String(Math.floor(seconds / 60)).padStart(2, '0');
-            let s = String(seconds % 60).padStart(2, '0');
-            document.getElementById("timer").innerText = `${m}:${s}`;
-        }
-    }, 1000);
-</script>
- -->
-
-<div id="timer">00:00</div>
-
-<script>
-    let started = false;
-    let seconds = 0;
-
-    function startTimer() {
-        if (started) return;
-        started = true;
-
-        setInterval(() => {
-            if (seconds >= 5999) return;
-
-            seconds++;
-            let m = String(Math.floor(seconds / 60)).padStart(2, '0');
-            let s = String(seconds % 60).padStart(2, '0');
-            document.getElementById("timer").innerText = `${m}:${s}`;
-        }, 1000);
-    }
+    })();
 </script>

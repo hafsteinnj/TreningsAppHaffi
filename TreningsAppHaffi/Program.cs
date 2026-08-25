@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+// Needed for SweeperGame's per-user game state.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
 var connectionString = builder.Configuration.GetConnectionString("MyAzureSqlConnectionString")
     ?? throw new InvalidOperationException("Connection string 'MyAzureSqlConnectionString' not found.");
 
@@ -32,6 +36,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthorization();
 
