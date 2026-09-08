@@ -43,6 +43,11 @@ public class NavApiClient
         HttpResponseMessage response = await _httpClient.GetAsync(
             "https://pam-stilling-feed.nav.no/api/v1/feed");
 
+        Console.WriteLine("----- RESPONSE HEADERS -----");
+        Console.WriteLine($"Last-Modified: {response.Content.Headers.LastModified}");
+        Console.WriteLine($"ETag: {response.Headers.ETag}");
+        Console.WriteLine("----------------------------");
+
         response.EnsureSuccessStatusCode();
 
         string json = await response.Content.ReadAsStringAsync();
@@ -69,15 +74,73 @@ public class NavApiClient
         // --------------------------------------------------
 
         _httpClient.DefaultRequestHeaders.IfModifiedSince =
-            newestModification;
+            response.Content.Headers.LastModified;
 
-        HttpResponseMessage secondResponse =
-            await _httpClient.GetAsync(
-                "https://pam-stilling-feed.nav.no/api/v1/feed");
+        HttpResponseMessage secondResponse = await _httpClient.GetAsync(
+            "https://pam-stilling-feed.nav.no/api/v1/feed");
 
         Console.WriteLine("----- SECOND REQUEST -----");
-        Console.WriteLine(
-            $"Second response: {secondResponse.StatusCode}");
+        Console.WriteLine($"Status: {(int)secondResponse.StatusCode} {secondResponse.StatusCode}");
+        Console.WriteLine("--------------------------");
+
+        // --------------------------------------------------
+        // TEST 3: Request the next page, then request that
+        //         same page again using its Last-Modified.
+        // --------------------------------------------------
+
+        if (!string.IsNullOrEmpty(feed.NextUrl))
+        {
+            string nextPageUrl =
+                "https://pam-stilling-feed.nav.no" + feed.NextUrl;
+
+            // First request for the next page.
+            HttpResponseMessage nextResponse =
+                await _httpClient.GetAsync(nextPageUrl);
+
+            Console.WriteLine("----- NEXT PAGE REQUEST -----");
+            Console.WriteLine(
+                $"Status: {(int)nextResponse.StatusCode} {nextResponse.StatusCode}");
+            Console.WriteLine($"URL: {nextPageUrl}");
+            Console.WriteLine(
+                $"Last-Modified: {nextResponse.Content.Headers.LastModified}");
+            Console.WriteLine(
+                $"ETag: {nextResponse.Headers.ETag}");
+
+            nextResponse.EnsureSuccessStatusCode();
+
+            string nextJson =
+                await nextResponse.Content.ReadAsStringAsync();
+
+            var nextFeed =
+                JsonSerializer.Deserialize<NavFeed>(nextJson)
+                ?? throw new InvalidOperationException(
+                    "NAV returned an empty or invalid next page.");
+
+            Console.WriteLine(
+                $"Next page advertisements: {nextFeed.Items.Count}");
+
+            Console.WriteLine(
+                $"Next page Next URL: {nextFeed.NextUrl}");
+
+            // Save this page's Last-Modified value.
+            DateTimeOffset? nextPageLastModified =
+                nextResponse.Content.Headers.LastModified;
+
+            // --------------------------------------------------
+            // Request the EXACT SAME page again, using the
+            // Last-Modified value we just received.
+            // --------------------------------------------------
+
+            _httpClient.DefaultRequestHeaders.IfModifiedSince = null;
+
+            HttpResponseMessage repeatResponse =
+                await _httpClient.GetAsync(nextPageUrl);
+
+            Console.WriteLine("----- REPEAT NEXT PAGE -----");
+            Console.WriteLine(
+                $"Status: {(int)repeatResponse.StatusCode} {repeatResponse.StatusCode}");
+            Console.WriteLine("-----------------------------");
+        }
 
         if (secondResponse.StatusCode == System.Net.HttpStatusCode.NotModified)
         {
