@@ -16,7 +16,11 @@ public class NavApiClient
         string token = await _httpClient.GetStringAsync(
             "https://pam-stilling-feed.nav.no/api/publicToken");
 
-        token = token.Trim();
+        const string prefix = "Current public token for Nav Job Vacancy Feed:";
+
+        token = token
+            .Replace(prefix, "")
+            .Trim();
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
