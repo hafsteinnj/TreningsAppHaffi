@@ -3,6 +3,19 @@
 
 <h1>NAV API Test</h1>
 
-<pre>
-@Model.ApiResult
-</pre>
+@if (Model.Feed != null)
+{
+    <p>Received @Model.Feed.Items.Count advertisements.</p>
+
+    @foreach (var job in Model.Feed.Items)
+    {
+        <div>
+            <strong>@job.Title</strong><br />
+            @job.FeedEntry?.BusinessName<br />
+            Municipality: @job.FeedEntry?.Municipal<br />
+            Status: @job.FeedEntry?.Status
+        </div>
+
+        <hr />
+    }
+}

@@ -1,4 +1,7 @@
 ﻿using System.Net.Http.Headers;
+using System.Text.Json;
+using TreningsAppHaffi.Data;
+
 namespace TreningsAppHaffi.Services;
 
 public class NavApiClient
@@ -10,7 +13,7 @@ public class NavApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<string> GetFeedAsync()
+    public async Task<NavFeed> GetFeedAsync()
     {
         // Get metode for public NAV api token. Kun for testing. Gyldig i 24timer.
         string token = await _httpClient.GetStringAsync(
@@ -30,6 +33,9 @@ public class NavApiClient
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsStringAsync();
+        string json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<NavFeed>(json)
+            ?? throw new InvalidOperationException("NAV returned an empty or invalid feed.");
     }
 }

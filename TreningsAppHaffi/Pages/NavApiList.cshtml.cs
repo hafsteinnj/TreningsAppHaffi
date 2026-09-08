@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TreningsAppHaffi.Data;
 using TreningsAppHaffi.Services;
 
 namespace TreningsAppHaffi.Pages;
@@ -7,7 +8,7 @@ public class NavApiListModel : PageModel
 {
     private readonly NavApiClient _navApiClient;
 
-    public string? ApiResult { get; set; }
+    public NavFeed? Feed { get; set; }
 
     public NavApiListModel(NavApiClient navApiClient)
     {
@@ -16,6 +17,6 @@ public class NavApiListModel : PageModel
 
     public async Task OnGetAsync()
     {
-        ApiResult = await _navApiClient.GetFeedAsync();
+        Feed = await _navApiClient.GetFeedAsync();
     }
 }
