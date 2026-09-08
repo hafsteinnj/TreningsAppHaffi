@@ -16,7 +16,7 @@ public class NavApiClient
 
     public async Task<NavFeed> GetFeedAsync()
     {
-        // Get metode for public NAV api token. Kun for testing. Gyldig i 24timer.
+        // Get the current public API token.
         string token = await _httpClient.GetStringAsync(
             "https://pam-stilling-feed.nav.no/api/publicToken");
 
@@ -29,6 +29,13 @@ public class NavApiClient
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
+        // Only ask NAV for entries modified within the last year.
+        DateTimeOffset oneYearAgo =
+            DateTimeOffset.UtcNow.AddYears(-1);
+
+        _httpClient.DefaultRequestHeaders.IfModifiedSince = oneYearAgo;
+
+        // Get the first page.
         HttpResponseMessage response = await _httpClient.GetAsync(
             "https://pam-stilling-feed.nav.no/api/v1/feed");
 
@@ -37,48 +44,68 @@ public class NavApiClient
         string json = await response.Content.ReadAsStringAsync();
 
         var feed = JsonSerializer.Deserialize<NavFeed>(json)
-            ?? throw new InvalidOperationException("NAV returned an empty or invalid feed.");
+            ?? throw new InvalidOperationException(
+                "NAV returned an empty or invalid feed.");
 
-        Console.WriteLine($"Next URL: {feed.NextUrl}");
+        // Temporary test statistics.
+        int totalCount = 0;
+        int inactiveCount = 0;
+        int activeRanaCount = 0;
+        int pageCount = 0;
 
-        if (!string.IsNullOrEmpty(feed.NextUrl))
+        // Process the first page.
+        pageCount++;
+
+        totalCount += feed.Items.Count;
+
+        inactiveCount += feed.Items.Count(x =>
+            x.FeedEntry?.Status == "INACTIVE");
+
+        activeRanaCount += feed.Items.Count(x =>
+            x.FeedEntry?.Status == "ACTIVE" &&
+            x.FeedEntry?.Municipal == "RANA");
+
+        // Follow the remaining pages.
+        string? nextUrl = feed.NextUrl;
+
+        while (!string.IsNullOrEmpty(nextUrl))
         {
-            string nextUrl = "https://pam-stilling-feed.nav.no" + feed.NextUrl;
+            string fullNextUrl =
+                "https://pam-stilling-feed.nav.no" + nextUrl;
 
             HttpResponseMessage nextResponse =
-                await _httpClient.GetAsync(nextUrl);
+                await _httpClient.GetAsync(fullNextUrl);
 
-            Console.WriteLine($"Next response: {nextResponse.StatusCode}");
+            nextResponse.EnsureSuccessStatusCode();
 
-            string nextJson = await nextResponse.Content.ReadAsStringAsync();
+            string nextJson =
+                await nextResponse.Content.ReadAsStringAsync();
 
-            var nextFeed = JsonSerializer.Deserialize<NavFeed>(nextJson)
-                ?? throw new InvalidOperationException("NAV returned an empty or invalid second feed.");
+            var nextFeed =
+                JsonSerializer.Deserialize<NavFeed>(nextJson)
+                ?? throw new InvalidOperationException(
+                    "NAV returned an empty or invalid feed page.");
 
-            int ranaCount = nextFeed.Items.Count(x =>
+            pageCount++;
+
+            totalCount += nextFeed.Items.Count;
+
+            inactiveCount += nextFeed.Items.Count(x =>
+                x.FeedEntry?.Status == "INACTIVE");
+
+            activeRanaCount += nextFeed.Items.Count(x =>
+                x.FeedEntry?.Status == "ACTIVE" &&
                 x.FeedEntry?.Municipal == "RANA");
 
-            Console.WriteLine($"Next page advertisements: {nextFeed.Items.Count}");
-            Console.WriteLine($"Next page RANA advertisements: {ranaCount}");
-            Console.WriteLine($"Next page Next URL: {nextFeed.NextUrl}");
-
-            var ranaJob = nextFeed.Items
-                .FirstOrDefault(x => x.FeedEntry?.Municipal == "RANA");
-
-            if (ranaJob != null)
-            {
-                Console.WriteLine($"RANA job ID: {ranaJob.Id}");
-                Console.WriteLine($"RANA job URL: {ranaJob.Url}");
-                HttpResponseMessage detailResponse = await _httpClient.GetAsync(
-                    "https://pam-stilling-feed.nav.no" + ranaJob.Url);
-
-                Console.WriteLine($"Detail response: {detailResponse.StatusCode}");
-
-                string detailJson = await detailResponse.Content.ReadAsStringAsync();
-
-                Console.WriteLine(detailJson);
-            }
+            nextUrl = nextFeed.NextUrl;
         }
+
+        Console.WriteLine("----- NAV FEED TEST -----");
+        Console.WriteLine($"Pages received: {pageCount}");
+        Console.WriteLine($"Total advertisements: {totalCount}");
+        Console.WriteLine($"Inactive advertisements: {inactiveCount}");
+        Console.WriteLine($"Active RANA advertisements: {activeRanaCount}");
+        Console.WriteLine("-------------------------");
 
         return feed;
     }
