@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TreningsAppHaffi.Pages
 {
-    public class ChangelogModel : PageModel
+    public class DagbokModel : PageModel
     {
         public void OnGet()
         {
