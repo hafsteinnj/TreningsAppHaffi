@@ -29,13 +29,17 @@ public class NavApiClient
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        // Only ask NAV for entries modified within the last year.
-        DateTimeOffset oneYearAgo =
-            DateTimeOffset.UtcNow.AddYears(-1);
+        // --------------------------------------------------
+        // TEST 1: Ask for advertisements modified in the
+        //         last 3 months.
+        // --------------------------------------------------
 
-        _httpClient.DefaultRequestHeaders.IfModifiedSince = oneYearAgo;
+        DateTimeOffset threeMonthsAgo =
+            DateTimeOffset.UtcNow.AddMonths(-3);
 
-        // Get the first page.
+        _httpClient.DefaultRequestHeaders.IfModifiedSince =
+            threeMonthsAgo;
+
         HttpResponseMessage response = await _httpClient.GetAsync(
             "https://pam-stilling-feed.nav.no/api/v1/feed");
 
@@ -47,64 +51,58 @@ public class NavApiClient
             ?? throw new InvalidOperationException(
                 "NAV returned an empty or invalid feed.");
 
-        // Temporary test statistics.
-        int totalCount = 0;
-        int inactiveCount = 0;
-        int activeRanaCount = 0;
-        int pageCount = 0;
+        Console.WriteLine("----- FIRST REQUEST -----");
+        Console.WriteLine($"First page advertisements: {feed.Items.Count}");
+        Console.WriteLine($"First page Next URL: {feed.NextUrl}");
 
-        // Process the first page.
-        pageCount++;
+        // Find the newest modification time on this page.
+        DateTimeOffset newestModification =
+            feed.Items.Max(x =>
+                new DateTimeOffset(x.DateModified));
 
-        totalCount += feed.Items.Count;
+        Console.WriteLine(
+            $"Newest modification on first page: {newestModification}");
 
-        inactiveCount += feed.Items.Count(x =>
-            x.FeedEntry?.Status == "INACTIVE");
+        // --------------------------------------------------
+        // TEST 2: Ask NAV for changes since the newest
+        //         modification we just received.
+        // --------------------------------------------------
 
-        activeRanaCount += feed.Items.Count(x =>
-            x.FeedEntry?.Status == "ACTIVE" &&
-            x.FeedEntry?.Municipal == "RANA");
+        _httpClient.DefaultRequestHeaders.IfModifiedSince =
+            newestModification;
 
-        // Follow the remaining pages.
-        string? nextUrl = feed.NextUrl;
+        HttpResponseMessage secondResponse =
+            await _httpClient.GetAsync(
+                "https://pam-stilling-feed.nav.no/api/v1/feed");
 
-        while (!string.IsNullOrEmpty(nextUrl))
+        Console.WriteLine("----- SECOND REQUEST -----");
+        Console.WriteLine(
+            $"Second response: {secondResponse.StatusCode}");
+
+        if (secondResponse.StatusCode == System.Net.HttpStatusCode.NotModified)
         {
-            string fullNextUrl =
-                "https://pam-stilling-feed.nav.no" + nextUrl;
+            Console.WriteLine(
+                "NAV says there have been no changes.");
+        }
+        else
+        {
+            secondResponse.EnsureSuccessStatusCode();
 
-            HttpResponseMessage nextResponse =
-                await _httpClient.GetAsync(fullNextUrl);
+            string secondJson =
+                await secondResponse.Content.ReadAsStringAsync();
 
-            nextResponse.EnsureSuccessStatusCode();
-
-            string nextJson =
-                await nextResponse.Content.ReadAsStringAsync();
-
-            var nextFeed =
-                JsonSerializer.Deserialize<NavFeed>(nextJson)
+            var secondFeed =
+                JsonSerializer.Deserialize<NavFeed>(secondJson)
                 ?? throw new InvalidOperationException(
-                    "NAV returned an empty or invalid feed page.");
+                    "NAV returned an empty or invalid second feed.");
 
-            pageCount++;
+            Console.WriteLine(
+                $"Second page advertisements: {secondFeed.Items.Count}");
 
-            totalCount += nextFeed.Items.Count;
-
-            inactiveCount += nextFeed.Items.Count(x =>
-                x.FeedEntry?.Status == "INACTIVE");
-
-            activeRanaCount += nextFeed.Items.Count(x =>
-                x.FeedEntry?.Status == "ACTIVE" &&
-                x.FeedEntry?.Municipal == "RANA");
-
-            nextUrl = nextFeed.NextUrl;
+            Console.WriteLine(
+                $"Second page Next URL: {secondFeed.NextUrl}");
         }
 
-        Console.WriteLine("----- NAV FEED TEST -----");
-        Console.WriteLine($"Pages received: {pageCount}");
-        Console.WriteLine($"Total advertisements: {totalCount}");
-        Console.WriteLine($"Inactive advertisements: {inactiveCount}");
-        Console.WriteLine($"Active RANA advertisements: {activeRanaCount}");
         Console.WriteLine("-------------------------");
 
         return feed;
