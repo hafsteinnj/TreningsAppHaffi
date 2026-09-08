@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using TreningsAppHaffi.Data;
+using TreningsAppHaffi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<NavApiClient>();
 
 // Needed for SweeperGame's per-user game state.
 builder.Services.AddDistributedMemoryCache();
