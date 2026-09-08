@@ -64,6 +64,12 @@ public class NavApiClient
         DateTimeOffset newestModification =
             feed.Items.Max(x =>
                 new DateTimeOffset(x.DateModified));
+        DateTimeOffset oldestModification =
+            feed.Items.Min(x =>
+                new DateTimeOffset(x.DateModified));
+
+        Console.WriteLine(
+            $"Oldest modification on first page: {oldestModification}");
 
         Console.WriteLine(
             $"Newest modification on first page: {newestModification}");
@@ -84,86 +90,57 @@ public class NavApiClient
         Console.WriteLine("--------------------------");
 
         // --------------------------------------------------
-        // TEST 3: Request the next page, then request that
-        //         same page again using its Last-Modified.
+        // TEST 3: Follow several pages through next_url.
         // --------------------------------------------------
 
-        if (!string.IsNullOrEmpty(feed.NextUrl))
+        string? currentUrl = feed.NextUrl;
+
+        for (int pageNumber = 2; pageNumber <= 5; pageNumber++)
         {
-            string nextPageUrl =
-                "https://pam-stilling-feed.nav.no" + feed.NextUrl;
+            if (string.IsNullOrEmpty(currentUrl))
+            {
+                Console.WriteLine("No more pages.");
+                break;
+            }
 
-            // First request for the next page.
-            HttpResponseMessage nextResponse =
-                await _httpClient.GetAsync(nextPageUrl);
+            string pageUrl =
+                "https://pam-stilling-feed.nav.no" + currentUrl;
 
-            Console.WriteLine("----- NEXT PAGE REQUEST -----");
-            Console.WriteLine(
-                $"Status: {(int)nextResponse.StatusCode} {nextResponse.StatusCode}");
-            Console.WriteLine($"URL: {nextPageUrl}");
-            Console.WriteLine(
-                $"Last-Modified: {nextResponse.Content.Headers.LastModified}");
-            Console.WriteLine(
-                $"ETag: {nextResponse.Headers.ETag}");
+            HttpResponseMessage pageResponse =
+                await _httpClient.GetAsync(pageUrl);
 
-            nextResponse.EnsureSuccessStatusCode();
+            pageResponse.EnsureSuccessStatusCode();
 
-            string nextJson =
-                await nextResponse.Content.ReadAsStringAsync();
+            string pageJson =
+                await pageResponse.Content.ReadAsStringAsync();
 
-            var nextFeed =
-                JsonSerializer.Deserialize<NavFeed>(nextJson)
+            var pageFeed =
+                JsonSerializer.Deserialize<NavFeed>(pageJson)
                 ?? throw new InvalidOperationException(
-                    "NAV returned an empty or invalid next page.");
+                    "NAV returned an empty or invalid page.");
 
+            DateTimeOffset pageoldestModification =
+                pageFeed.Items.Min(x =>
+                    new DateTimeOffset(x.DateModified));
+
+            DateTimeOffset pageNewestModification =
+                pageFeed.Items.Max(x =>
+                    new DateTimeOffset(x.DateModified));
+
+            Console.WriteLine($"----- PAGE {pageNumber} -----");
             Console.WriteLine(
-                $"Next page advertisements: {nextFeed.Items.Count}");
-
+                $"Advertisements: {pageFeed.Items.Count}");
             Console.WriteLine(
-                $"Next page Next URL: {nextFeed.NextUrl}");
-
-            // Save this page's Last-Modified value.
-            DateTimeOffset? nextPageLastModified =
-                nextResponse.Content.Headers.LastModified;
-
-            // --------------------------------------------------
-            // Request the EXACT SAME page again, using the
-            // Last-Modified value we just received.
-            // --------------------------------------------------
-
-            _httpClient.DefaultRequestHeaders.IfModifiedSince = null;
-
-            HttpResponseMessage repeatResponse =
-                await _httpClient.GetAsync(nextPageUrl);
-
-            Console.WriteLine("----- REPEAT NEXT PAGE -----");
+                $"Last-Modified: {pageResponse.Content.Headers.LastModified}");
             Console.WriteLine(
-                $"Status: {(int)repeatResponse.StatusCode} {repeatResponse.StatusCode}");
-            Console.WriteLine("-----------------------------");
-        }
-
-        if (secondResponse.StatusCode == System.Net.HttpStatusCode.NotModified)
-        {
+                $"Oldest modification: {pageoldestModification}");
             Console.WriteLine(
-                "NAV says there have been no changes.");
-        }
-        else
-        {
-            secondResponse.EnsureSuccessStatusCode();
-
-            string secondJson =
-                await secondResponse.Content.ReadAsStringAsync();
-
-            var secondFeed =
-                JsonSerializer.Deserialize<NavFeed>(secondJson)
-                ?? throw new InvalidOperationException(
-                    "NAV returned an empty or invalid second feed.");
-
+                $"Newest modification: {pageNewestModification}");
             Console.WriteLine(
-                $"Second page advertisements: {secondFeed.Items.Count}");
+                $"Next URL: {pageFeed.NextUrl}");
+            Console.WriteLine("--------------------------");
 
-            Console.WriteLine(
-                $"Second page Next URL: {secondFeed.NextUrl}");
+            currentUrl = pageFeed.NextUrl;
         }
 
         Console.WriteLine("-------------------------");
