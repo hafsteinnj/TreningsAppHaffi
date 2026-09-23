@@ -21,5 +21,7 @@ namespace TreningsAppHaffi.Data
         // public DbSet<Product> Products { get; set; }
 
         public DbSet<TestEntry> TestEntries { get; set; }
+
+        public DbSet<NavJob> NavJobs { get; set; }
     }
 }

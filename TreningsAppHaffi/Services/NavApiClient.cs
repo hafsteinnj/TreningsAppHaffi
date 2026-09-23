@@ -14,13 +14,14 @@ public class NavApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<NavFeed> GetFeedAsync()
+    public async Task<List<NavJob>> GetRanaJobsAsync()
     {
         // Get the current public API token.
         string token = await _httpClient.GetStringAsync(
             "https://pam-stilling-feed.nav.no/api/publicToken");
 
-        const string prefix = "Current public token for Nav Job Vacancy Feed:";
+        const string prefix =
+            "Current public token for Nav Job Vacancy Feed:";
 
         token = token
             .Replace(prefix, "")
@@ -29,122 +30,99 @@ public class NavApiClient
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        // --------------------------------------------------
-        // TEST 1: Ask for advertisements modified in the
-        //         last 3 months.
-        // --------------------------------------------------
-
-        DateTimeOffset threeMonthsAgo =
+        // Start three months back.
+        DateTimeOffset startDate =
             DateTimeOffset.UtcNow.AddMonths(-3);
 
         _httpClient.DefaultRequestHeaders.IfModifiedSince =
-            threeMonthsAgo;
+            startDate;
 
-        HttpResponseMessage response = await _httpClient.GetAsync(
-            "https://pam-stilling-feed.nav.no/api/v1/feed");
+        var ranaJobs = new List<NavJob>();
 
-        Console.WriteLine("----- RESPONSE HEADERS -----");
-        Console.WriteLine($"Last-Modified: {response.Content.Headers.LastModified}");
-        Console.WriteLine($"ETag: {response.Headers.ETag}");
-        Console.WriteLine("----------------------------");
+        string? currentUrl = "/api/v1/feed";
 
-        response.EnsureSuccessStatusCode();
-
-        string json = await response.Content.ReadAsStringAsync();
-
-        var feed = JsonSerializer.Deserialize<NavFeed>(json)
-            ?? throw new InvalidOperationException(
-                "NAV returned an empty or invalid feed.");
-
-        Console.WriteLine("----- FIRST REQUEST -----");
-        Console.WriteLine($"First page advertisements: {feed.Items.Count}");
-        Console.WriteLine($"First page Next URL: {feed.NextUrl}");
-
-        // Find the newest modification time on this page.
-        DateTimeOffset newestModification =
-            feed.Items.Max(x =>
-                new DateTimeOffset(x.DateModified));
-        DateTimeOffset oldestModification =
-            feed.Items.Min(x =>
-                new DateTimeOffset(x.DateModified));
-
-        Console.WriteLine(
-            $"Oldest modification on first page: {oldestModification}");
-
-        Console.WriteLine(
-            $"Newest modification on first page: {newestModification}");
-
-        // --------------------------------------------------
-        // TEST 2: Ask NAV for changes since the newest
-        //         modification we just received.
-        // --------------------------------------------------
-
-        _httpClient.DefaultRequestHeaders.IfModifiedSince =
-            response.Content.Headers.LastModified;
-
-        HttpResponseMessage secondResponse = await _httpClient.GetAsync(
-            "https://pam-stilling-feed.nav.no/api/v1/feed");
-
-        Console.WriteLine("----- SECOND REQUEST -----");
-        Console.WriteLine($"Status: {(int)secondResponse.StatusCode} {secondResponse.StatusCode}");
-        Console.WriteLine("--------------------------");
-
-        // --------------------------------------------------
-        // TEST 3: Follow several pages through next_url.
-        // --------------------------------------------------
-
-        string? currentUrl = feed.NextUrl;
-
-        for (int pageNumber = 2; pageNumber <= 5; pageNumber++)
+        while (!string.IsNullOrEmpty(currentUrl))
         {
-            if (string.IsNullOrEmpty(currentUrl))
-            {
-                Console.WriteLine("No more pages.");
-                break;
-            }
-
             string pageUrl =
                 "https://pam-stilling-feed.nav.no" + currentUrl;
 
-            HttpResponseMessage pageResponse =
+            HttpResponseMessage response =
                 await _httpClient.GetAsync(pageUrl);
 
-            pageResponse.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
 
-            string pageJson =
-                await pageResponse.Content.ReadAsStringAsync();
+            string json =
+                await response.Content.ReadAsStringAsync();
 
-            var pageFeed =
-                JsonSerializer.Deserialize<NavFeed>(pageJson)
+            var feed =
+                JsonSerializer.Deserialize<NavFeed>(json)
                 ?? throw new InvalidOperationException(
-                    "NAV returned an empty or invalid page.");
+                    "NAV returned an empty or invalid feed.");
 
-            DateTimeOffset pageoldestModification =
-                pageFeed.Items.Min(x =>
-                    new DateTimeOffset(x.DateModified));
+            foreach (NavFeedItem item in feed.Items)
+            {
+                // We only care about active RANA advertisements.
+                if (item.FeedEntry?.Status != "ACTIVE")
+                    continue;
 
-            DateTimeOffset pageNewestModification =
-                pageFeed.Items.Max(x =>
-                    new DateTimeOffset(x.DateModified));
+                if (item.FeedEntry.Municipal != "RANA") // Kan evt endre dette hvis jeg flytter.
+                    continue;
 
-            Console.WriteLine($"----- PAGE {pageNumber} -----");
-            Console.WriteLine(
-                $"Advertisements: {pageFeed.Items.Count}");
-            Console.WriteLine(
-                $"Last-Modified: {pageResponse.Content.Headers.LastModified}");
-            Console.WriteLine(
-                $"Oldest modification: {pageoldestModification}");
-            Console.WriteLine(
-                $"Newest modification: {pageNewestModification}");
-            Console.WriteLine(
-                $"Next URL: {pageFeed.NextUrl}");
-            Console.WriteLine("--------------------------");
+                if (string.IsNullOrEmpty(item.Url))
+                    continue;
 
-            currentUrl = pageFeed.NextUrl;
+                // Get the full advertisement.
+                HttpResponseMessage detailResponse =
+                    await _httpClient.GetAsync(
+                        "https://pam-stilling-feed.nav.no" + item.Url);
+
+                if (!detailResponse.IsSuccessStatusCode)
+                    continue;
+
+                string detailJson =
+                    await detailResponse.Content.ReadAsStringAsync();
+
+                var detail =
+                    JsonSerializer.Deserialize<NavJobDetail>(detailJson);
+
+                if (detail == null)
+                    continue;
+
+                if (detail.Json == null)
+                    continue;
+
+                ranaJobs.Add(new NavJob
+                {
+                    NavId = item.FeedEntry.Uuid ?? item.Id ?? "",
+                    Title = detail.Json.Title
+                            ?? item.Title
+                            ?? "",
+
+                    Employer = detail.Json.Employer?.Name
+                               ?? item.FeedEntry.BusinessName,
+
+                    Municipality = item.FeedEntry.Municipal,
+
+                    PublishedDate = detail.Json.Published,
+
+                    Deadline = detail.Json.ApplicationDue,
+
+                    Position = detail.Json.JobTitle,
+
+                    Url = detail.Json.Link
+                          ?? item.Url,
+
+                    Status = item.FeedEntry.Status,
+
+                    LastModified = item.DateModified,
+
+                    IsNew = true
+                });
+            }
+
+            currentUrl = feed.NextUrl;
         }
 
-        Console.WriteLine("-------------------------");
-
-        return feed;
+        return ranaJobs;
     }
 }
