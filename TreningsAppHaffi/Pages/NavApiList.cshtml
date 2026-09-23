@@ -3,55 +3,19 @@
 
 <h1>NAV Job Advertisements</h1>
 
-<form method="post">
-    <button type="submit" asp-page-handler="Sync">
+<form method="post" id="syncForm">
+    <button type="submit" asp-page-handler="Sync" id="syncButton">
         Sync with NAV
     </button>
+
+    <span id="syncStatus"></span>
 </form>
 
 @if (ViewData["SyncResult"] is string result)
 {
-    <p>@result</p>
-}
-@if (ViewData["Municipalities"] is string municipalities)
-{
     <p>
-        <strong>Municipalities found:</strong>
-        @municipalities
+        <strong>@result</strong>
     </p>
-}
-@if (ViewData["RanaCount"] is string ranaCount)
-{
-    <p>@ranaCount</p>
-}
-
-@if (ViewData["ActiveRanaCount"] is string activeRanaCount)
-{
-    <p>@activeRanaCount</p>
-}
-@if (ViewData["RanaMissingUrl"] is string ranaMissingUrl)
-{
-    <p>@ranaMissingUrl</p>
-}
-
-@if (ViewData["RanaDetailFailed"] is string ranaDetailFailed)
-{
-    <p>@ranaDetailFailed</p>
-}
-
-@if (ViewData["RanaDetailJsonMissing"] is string ranaDetailJsonMissing)
-{
-    <p>@ranaDetailJsonMissing</p>
-}
-
-@if (ViewData["DetailJson"] is string detailJson)
-{
-    <pre style="white-space: pre-wrap;">@detailJson</pre>
-}
-
-@if (ViewData["SyncError"] is string syncError)
-{
-    <pre style="white-space: pre-wrap;">@syncError</pre>
 }
 
 <hr />
@@ -66,13 +30,52 @@ else
     {
         <div>
             <strong>@job.Title</strong><br />
-            @job.Employer<br />
-            @job.Municipality<br />
-            Published: @job.PublishedDate<br />
-            Deadline: @job.Deadline<br />
-            Status: @job.Status
+
+            @if (!string.IsNullOrEmpty(job.Employer))
+            {
+                @job.Employer
+                <br />
+            }
+
+            @if (!string.IsNullOrEmpty(job.Municipality))
+            {
+                @job.Municipality
+                <br />
+            }
+
+            Published:
+            @job.PublishedDate?.ToString("dd.MM.yyyy")
+            <br />
+
+            Deadline:
+            @job.Deadline?.ToString("dd.MM.yyyy")
+            <br />
+
+            @if (!string.IsNullOrEmpty(job.Position))
+            {
+                @job.Position
+                <br />
+            }
+
+            @if (!string.IsNullOrEmpty(job.Url))
+            {
+                <a href="@job.Url" target="_blank">
+                    View job advertisement
+                </a>
+            }
         </div>
 
         <hr />
     }
 }
+
+<script>
+    document.getElementById("syncForm").addEventListener("submit", function () {
+        const button = document.getElementById("syncButton");
+        const status = document.getElementById("syncStatus");
+
+        button.disabled = true;
+        button.textContent = "Syncing...";
+        status.textContent = " Please wait...";
+    });
+</script>

@@ -30,66 +30,77 @@ public class NavApiListModel : PageModel
 
     public async Task<IActionResult> OnPostSyncAsync()
     {
-        try
+        DateTime oneMonthAgo =
+            DateTime.UtcNow.AddMonths(-1);
+
+        DateTime latestLastModified =
+            await _db.NavJobs
+                .Where(job => job.LastModified.HasValue)
+                .MaxAsync(job => (DateTime?)job.LastModified)
+                ?? oneMonthAgo;
+
+        DateTime syncStart =
+            latestLastModified > oneMonthAgo
+                ? latestLastModified
+                : oneMonthAgo;
+
+        List<NavJob> jobs =
+            await _navApiClient.GetRanaJobsAsync(syncStart);
+
+        int addedCount = 0;
+        int updatedCount = 0;
+
+        List<NavJob> latestJobs = jobs
+            .Where(job => !string.IsNullOrEmpty(job.NavId))
+            .GroupBy(job => job.NavId)
+            .Select(group => group
+                .OrderByDescending(job => job.LastModified)
+                .First())
+            .ToList();
+
+        foreach (NavJob job in latestJobs)
         {
-            List<NavJob> jobs =
-                await _navApiClient.GetRanaJobsAsync();
+            NavJob? existingJob = await _db.NavJobs
+                .FirstOrDefaultAsync(x => x.NavId == job.NavId);
 
-            ViewData["SyncResult"] =
-                $"NAV returned {jobs.Count} RANA jobs.";
-
-            foreach (NavJob job in jobs
-                .GroupBy(job => job.NavId)
-                .Select(group => group
-                    .OrderByDescending(job => job.LastModified)
-                    .First()))
+            if (existingJob == null)
             {
-                NavJob? existingJob = await _db.NavJobs
-                    .FirstOrDefaultAsync(x => x.NavId == job.NavId);
-
-                if (existingJob == null)
-                {
-                    _db.NavJobs.Add(job);
-                }
-                else
-                {
-                    existingJob.Title = job.Title;
-                    existingJob.Employer = job.Employer;
-                    existingJob.Municipality = job.Municipality;
-                    existingJob.PublishedDate = job.PublishedDate;
-                    existingJob.Deadline = job.Deadline;
-                    existingJob.Position = job.Position;
-                    existingJob.Url = job.Url;
-                    existingJob.Status = job.Status;
-                    existingJob.LastModified = job.LastModified;
-
-                    existingJob.IsNew = false;
-                }
+                _db.NavJobs.Add(job);
+                addedCount++;
+                continue;
             }
 
-            ViewData["SyncResult"] +=
-                " Preparing to save to SQL.";
+            if (job.LastModified.HasValue &&
+                (!existingJob.LastModified.HasValue ||
+                 job.LastModified.Value > existingJob.LastModified.Value))
+            {
+                existingJob.Title = job.Title;
+                existingJob.Employer = job.Employer;
+                existingJob.Municipality = job.Municipality;
+                existingJob.PublishedDate = job.PublishedDate;
+                existingJob.Deadline = job.Deadline;
+                existingJob.Position = job.Position;
+                existingJob.Url = job.Url;
+                existingJob.Status = job.Status;
+                existingJob.LastModified = job.LastModified;
+                existingJob.IsNew = true;
 
-            await _db.SaveChangesAsync();
-
-            ViewData["SyncResult"] +=
-                " SQL save completed.";
-
-            Jobs = await _db.NavJobs
-                .OrderByDescending(job => job.PublishedDate)
-                .ToListAsync();
-
-            return Page();
+                updatedCount++;
+            }
         }
-        catch (Exception ex)
-        {
-            ViewData["SyncError"] = ex.ToString();
 
-            Jobs = await _db.NavJobs
-                .OrderByDescending(job => job.PublishedDate)
-                .ToListAsync();
+        await _db.SaveChangesAsync();
 
-            return Page();
-        }
+        string syncStartText = syncStart.ToString("dd.MM.yyyy HH:mm");
+
+        ViewData["SyncResult"] =
+            $"Sync complete: {addedCount} new, {updatedCount} updated. " +
+            $"Pulled jobs since {syncStartText}.";
+
+        Jobs = await _db.NavJobs
+            .OrderByDescending(job => job.PublishedDate)
+            .ToListAsync();
+
+        return Page();
     }
 }
