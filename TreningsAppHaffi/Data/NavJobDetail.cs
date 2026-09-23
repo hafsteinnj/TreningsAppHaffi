@@ -7,8 +7,8 @@ public class NavJobDetail
     [JsonPropertyName("uuid")]
     public string? Uuid { get; set; }
 
-    [JsonPropertyName("json")]
-    public NavJobContent? Json { get; set; }
+    [JsonPropertyName("ad_content")]
+    public NavJobContent? AdContent { get; set; }
 
     [JsonPropertyName("sistEndret")]
     public DateTime? SistEndret { get; set; }
@@ -32,7 +32,7 @@ public class NavJobContent
     public string? JobTitle { get; set; }
 
     [JsonPropertyName("applicationDue")]
-    public DateTime? ApplicationDue { get; set; }
+    public string? ApplicationDue { get; set; }
 
     [JsonPropertyName("link")]
     public string? Link { get; set; }

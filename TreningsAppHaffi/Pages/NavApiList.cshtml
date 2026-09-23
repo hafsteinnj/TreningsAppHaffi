@@ -3,9 +3,56 @@
 
 <h1>NAV Job Advertisements</h1>
 
-<button type="button">
-    Sync with NAV
-</button>
+<form method="post">
+    <button type="submit" asp-page-handler="Sync">
+        Sync with NAV
+    </button>
+</form>
+
+@if (ViewData["SyncResult"] is string result)
+{
+    <p>@result</p>
+}
+@if (ViewData["Municipalities"] is string municipalities)
+{
+    <p>
+        <strong>Municipalities found:</strong>
+        @municipalities
+    </p>
+}
+@if (ViewData["RanaCount"] is string ranaCount)
+{
+    <p>@ranaCount</p>
+}
+
+@if (ViewData["ActiveRanaCount"] is string activeRanaCount)
+{
+    <p>@activeRanaCount</p>
+}
+@if (ViewData["RanaMissingUrl"] is string ranaMissingUrl)
+{
+    <p>@ranaMissingUrl</p>
+}
+
+@if (ViewData["RanaDetailFailed"] is string ranaDetailFailed)
+{
+    <p>@ranaDetailFailed</p>
+}
+
+@if (ViewData["RanaDetailJsonMissing"] is string ranaDetailJsonMissing)
+{
+    <p>@ranaDetailJsonMissing</p>
+}
+
+@if (ViewData["DetailJson"] is string detailJson)
+{
+    <pre style="white-space: pre-wrap;">@detailJson</pre>
+}
+
+@if (ViewData["SyncError"] is string syncError)
+{
+    <pre style="white-space: pre-wrap;">@syncError</pre>
+}
 
 <hr />
 

@@ -8,6 +8,13 @@ namespace TreningsAppHaffi.Services;
 public class NavApiClient
 {
     private readonly HttpClient _httpClient;
+    public List<string> LastMunicipalities { get; private set; } = new();
+    public int LastRanaCount { get; private set; }
+    public int LastActiveRanaCount { get; private set; }
+    public int LastRanaMissingUrl { get; private set; }
+    public int LastRanaDetailFailed { get; private set; }
+    public int LastRanaDetailJsonMissing { get; private set; }
+    public string? LastDetailJson { get; private set; }
 
     public NavApiClient(HttpClient httpClient)
     {
@@ -16,6 +23,14 @@ public class NavApiClient
 
     public async Task<List<NavJob>> GetRanaJobsAsync()
     {
+        LastMunicipalities.Clear();
+        LastRanaCount = 0;
+        LastActiveRanaCount = 0;
+        LastRanaMissingUrl = 0;
+        LastRanaDetailFailed = 0;
+        LastRanaDetailJsonMissing = 0;
+        LastDetailJson = null;
+
         // Get the current public API token.
         string token = await _httpClient.GetStringAsync(
             "https://pam-stilling-feed.nav.no/api/publicToken");
@@ -31,13 +46,22 @@ public class NavApiClient
             new AuthenticationHeaderValue("Bearer", token);
 
         // Start three months back.
+        /*
         DateTimeOffset startDate =
             DateTimeOffset.UtcNow.AddMonths(-3);
 
         _httpClient.DefaultRequestHeaders.IfModifiedSince =
             startDate;
+        */
+        DateTimeOffset oneDayAgo =
+        DateTimeOffset.UtcNow.AddDays(-1);
+
+        _httpClient.DefaultRequestHeaders.IfModifiedSince =
+            oneDayAgo;
 
         var ranaJobs = new List<NavJob>();
+        int ranaCount = 0; //testing
+        int activeRanaCount = 0; //testing
 
         string? currentUrl = "/api/v1/feed";
 
@@ -61,6 +85,23 @@ public class NavApiClient
 
             foreach (NavFeedItem item in feed.Items)
             {
+                string? municipality = item.FeedEntry?.Municipal;
+
+                if (!string.IsNullOrEmpty(municipality) &&
+                    !LastMunicipalities.Contains(municipality))
+                {
+                    LastMunicipalities.Add(municipality);
+                }
+                if (municipality == "RANA")
+                {
+                    ranaCount++;
+
+                    if (item.FeedEntry?.Status == "ACTIVE")
+                    {
+                        activeRanaCount++;
+                    }
+                }
+
                 // We only care about active RANA advertisements.
                 if (item.FeedEntry?.Status != "ACTIVE")
                     continue;
@@ -69,7 +110,10 @@ public class NavApiClient
                     continue;
 
                 if (string.IsNullOrEmpty(item.Url))
+                {
+                    LastRanaMissingUrl++;
                     continue;
+                }
 
                 // Get the full advertisement.
                 HttpResponseMessage detailResponse =
@@ -77,39 +121,57 @@ public class NavApiClient
                         "https://pam-stilling-feed.nav.no" + item.Url);
 
                 if (!detailResponse.IsSuccessStatusCode)
+                {
+                    LastRanaDetailFailed++;
                     continue;
+                }
 
                 string detailJson =
                     await detailResponse.Content.ReadAsStringAsync();
+
+                if (LastDetailJson == null)
+                {
+                    LastDetailJson = detailJson;
+                }
 
                 var detail =
                     JsonSerializer.Deserialize<NavJobDetail>(detailJson);
 
                 if (detail == null)
-                    continue;
+                {
+                    throw new InvalidOperationException(
+                        "NAV detail could not be deserialized.");
+                }
 
-                if (detail.Json == null)
+                if (detail.AdContent == null)
+                {
+                    LastRanaDetailJsonMissing++;
                     continue;
+                }
 
                 ranaJobs.Add(new NavJob
                 {
                     NavId = item.FeedEntry.Uuid ?? item.Id ?? "",
-                    Title = detail.Json.Title
+                    Title = detail.AdContent.Title
                             ?? item.Title
                             ?? "",
 
-                    Employer = detail.Json.Employer?.Name
+                    Employer = detail.AdContent.Employer?.Name
                                ?? item.FeedEntry.BusinessName,
 
                     Municipality = item.FeedEntry.Municipal,
 
-                    PublishedDate = detail.Json.Published,
+                    PublishedDate = detail.AdContent.Published,
 
-                    Deadline = detail.Json.ApplicationDue,
+                    Deadline = DateTime.TryParse(
+                        detail.AdContent.ApplicationDue,
+                        out DateTime deadline)
+                            ? deadline
+                            : null,
 
-                    Position = detail.Json.JobTitle,
+                    Position = detail.AdContent.JobTitle,
 
-                    Url = detail.Json.Link
+                    Url = detail.AdContent.Link
                           ?? item.Url,
 
                     Status = item.FeedEntry.Status,
@@ -122,6 +184,8 @@ public class NavApiClient
 
             currentUrl = feed.NextUrl;
         }
+        LastRanaCount = ranaCount;
+        LastActiveRanaCount = activeRanaCount;
 
         return ranaJobs;
     }
