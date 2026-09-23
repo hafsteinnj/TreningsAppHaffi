@@ -20,54 +20,64 @@
 
 <hr />
 
-@if (Model.Jobs.Count == 0)
-{
-    <p>No saved job advertisements.</p>
-}
-else
-{
-    @foreach (var job in Model.Jobs)
-    {
-        <div>
-            <strong>@job.Title</strong><br />
+<div id="jobList">
+    <p>Loading saved job advertisements...</p>
+</div>
 
-            @if (!string.IsNullOrEmpty(job.Employer))
-            {
-                @job.Employer
-                <br />
+<script>
+    async function loadSavedJobs() {
+        const jobList = document.getElementById("jobList");
+
+        try {
+            const response = await fetch("?handler=Jobs");
+
+            if (!response.ok) {
+                throw new Error("Could not load saved jobs.");
             }
 
-            @if (!string.IsNullOrEmpty(job.Municipality))
-            {
-                @job.Municipality
-                <br />
+            const jobs = await response.json();
+
+            if (jobs.length === 0) {
+                jobList.innerHTML =
+                    "<p>No saved job advertisements.</p>";
+                return;
             }
 
-            Published:
-            @job.PublishedDate?.ToString("dd.MM.yyyy")
-            <br />
+            jobList.innerHTML = "";
 
-            Deadline:
-            @job.Deadline?.ToString("dd.MM.yyyy")
-            <br />
+            for (const job of jobs) {
+                const jobElement = document.createElement("div");
 
-            @if (!string.IsNullOrEmpty(job.Position))
-            {
-                @job.Position
-                <br />
+                jobElement.innerHTML = `
+                        <strong>${job.title}</strong><br />
+                        ${job.employer ?? ""}<br />
+                        ${job.municipality ?? ""}<br />
+                        Published: ${job.publishedDate
+                        ? new Date(job.publishedDate).toLocaleDateString("no-NO")
+                        : ""}<br />
+                        Deadline: ${job.deadline
+                        ? new Date(job.deadline).toLocaleDateString("no-NO")
+                        : ""}<br />
+                        ${job.position ?? ""}<br />
+                        ${job.url
+                        ? `<a href="${job.url}" target="_blank">
+                                   View job advertisement
+                               </a>`
+                        : ""}
+                        <hr />
+                    `;
+
+                jobList.appendChild(jobElement);
             }
-
-            @if (!string.IsNullOrEmpty(job.Url))
-            {
-                <a href="@job.Url" target="_blank">
-                    View job advertisement
-                </a>
-            }
-        </div>
-
-        <hr />
+        }
+        catch (error) {
+            jobList.innerHTML =
+                "<p>Could not load saved job advertisements.</p>";
+        }
     }
-}
+
+    loadSavedJobs();
+</script>
 
 <script>
     document.getElementById("syncForm").addEventListener("submit", function () {

@@ -21,11 +21,19 @@ public class NavApiListModel : PageModel
         _navApiClient = navApiClient;
     }
 
-    public async Task OnGetAsync()
+    public void OnGet()
     {
-        Jobs = await _db.NavJobs
+        // The page itself loads immediately.
+        // Saved jobs are loaded separately by the browser.
+    }
+
+    public async Task<IActionResult> OnGetJobsAsync()
+    {
+        List<NavJob> jobs = await _db.NavJobs
             .OrderByDescending(job => job.PublishedDate)
             .ToListAsync();
+
+        return new JsonResult(jobs);
     }
 
     public async Task<IActionResult> OnPostSyncAsync()
